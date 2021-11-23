@@ -1,0 +1,51 @@
+# Global
+seed: 101
+input_height: 128 # For resizing and model creation
+input_width: 128 # For resizing and model creation
+# n_channels must be set in code based on dataset and task
+
+src_code_path: 'src' # put '' if packages are in root directory of your repository
+
+# Classes
+data_loader_class: dataset.DataLoader # Required
+model_builder_class: models.ModelBuilder # Required
+preprocessor_class: preprocessing.Preprocessror # Required
+augmentor_class: augmentation.Augmentor
+evaluator_class: evaluation.Evaluator
+
+# Epochs
+epochs: 30
+
+# Batch-size
+batch_size: 8
+
+# Parameters for instantiating DataLoader
+data_loader:
+  shuffle: True # on training data
+
+# Parameters for model-builder
+model_builder:
+  optimizer:
+    type: "adam"
+    initial_lr: 0.0001
+  loss_type: "binary_crossentropy"
+
+# Parameters for instantiating Preprocessor
+preprocessor:
+  normalization_type: null
+
+# Parameters for instantiating augmentation
+do_train_augmentation: True
+do_validation_augmentation: False
+augmentator:
+  rotation_proba: 0.5
+  rotation_range: 45
+  flip_proba: 0.5
+
+# Parameters for exporting, will be used by trainer
+export:
+  metric: "val_loss"
+  mode: "min"
+
+# MLFlow
+project_name: 'echo-lv-seg' # will be used as mlflow's experiment_name
