@@ -85,20 +85,19 @@ class DataLoader(DataLoaderBase):
         # self._add_train_val_to_data_frame(self.x_train_dir, self.x_val_dir)
 
     def _load_params(self, config):
-        cfg_dh = config.data_handler
-        self.stage = cfg_dh.dataset_features.stage
-        self.view = cfg_dh.dataset_features.view
-        self.batch_size = cfg_dh.batch_size
+        cfg_dl = config.data_loader
+        self.stage = cfg_dl.dataset_features.stage
+        self.view = cfg_dl.dataset_features.view
+        self.batch_size = 1
         self.input_h = config.input_h
         self.input_w = config.input_w
         # self.input_size = (self.input_h, self.input_w)
         self.n_channels = config.n_channels
         # self.split_ratio = cfg_dh.split_ratio
-        self.seed = cfg_dh.seed
-        self.shuffle = cfg_dh.shuffle
-        self.to_fit = cfg_dh.to_fit
-        self.dataset_dir = self.data_dir
-        self.info_df_dir = os.path.join(self.dataset_dir, 'info_df.csv')
+        self.seed = cfg_dl.seed
+        self.shuffle = cfg_dl.shuffle
+        self.to_fit = cfg_dl.to_fit
+        self.info_df_dir = os.path.join(self.data_dir, 'info_df.csv')
 
     def _set_defaults(self):
 
@@ -106,16 +105,14 @@ class DataLoader(DataLoaderBase):
 
         self.stage = ['ED', 'ES']
         self.view = ['4CH']
-
-        self.batch_size = 8
+        self.batch_size = 1
         self.input_h = 128
         self.input_w = 128
         self.n_channels = 1
         self.seed = 101
         self.shuffle = True
         self.to_fit = True
-        self.dataset_dir = 'EchoNet-Dynamic'
-        self.info_df_dir = os.path.join(self.dataset_dir, 'info_df.csv')
+        self.info_df_dir = os.path.join(self.data_dir, 'info_df.csv')
 
     def create_training_generator(self):
 
@@ -129,8 +126,8 @@ class DataLoader(DataLoaderBase):
                                           self.to_fit,
                                           self.shuffle,
                                           self.seed)
-        n_iter_train = train_data_gen.get_n_iter()
-        return train_data_gen, n_iter_train
+        n_train = len(self.train_indices)
+        return train_data_gen, n_train
 
     def create_validation_generator(self):
 
@@ -146,14 +143,14 @@ class DataLoader(DataLoaderBase):
                                         self.n_channels,
                                         self.to_fit,
                                         shuffle=False)
-        n_iter_val = val_data_gen.get_n_iter()
-        return val_data_gen, n_iter_val
+        val_n = len(self.val_indices)
+        return val_data_gen, val_n
 
     def create_test_generator(self):
 
         """
         Creates data generators based on batch_size, input_size
-
+        n_iter_val
         :returns dataset_gen: training data generator which yields (batch_size, h, w, c) tensors
         :returns n_iter_dataset: number of iterations per epoch for train_data_gen
         """
@@ -165,8 +162,8 @@ class DataLoader(DataLoaderBase):
                                          self.n_channels,
                                          self.to_fit,
                                          shuffle=False)
-        n_iter_test = test_data_gen.get_n_iter()
-        return test_data_gen, n_iter_test
+        test_n = test_data_gen.get_n_iter()
+        return test_data_gen, test_n
 
     @property
     def raw_df(self):
@@ -205,10 +202,10 @@ class DataLoader(DataLoaderBase):
                                               self.df_dataset['stage'].isin(self.stage)]
 
         self._clean_data_df['image_path'] = self._clean_data_df.apply(
-            lambda x: os.path.join(self.dataset_dir, 'Cases/', x['case_id'], x['mhd_image_filename']), axis=1)
+            lambda x: os.path.join(self.data_dir, 'Cases/', x['case_id'], x['mhd_image_filename']), axis=1)
 
         self._clean_data_df['label_path'] = self._clean_data_df.apply(
-            lambda x: os.path.join(self.dataset_dir, 'Cases/', x['case_id'], x['mhd_label_filename']), axis=1)
+            lambda x: os.path.join(self.data_dir, 'Cases/', x['case_id'], x['mhd_label_filename']), axis=1)
 
         # data_dir = self._clean_data_df[['case_id',
         #                                 'mhd_image_filename',
@@ -260,8 +257,8 @@ class DataLoader(DataLoaderBase):
         if os.path.exists(self.info_df_dir):
             self.df_dataset = pd.read_csv(self.info_df_dir)
         else:
-            file_list_df = pd.read_csv(os.path.join(self.dataset_dir, "FileList.csv"))
-            volume_tracing_df = pd.read_csv(os.path.join(self.dataset_dir, 'VolumeTracings.csv'))
+            file_list_df = pd.read_csv(os.path.join(self.data_dir, "FileList.csv"))
+            volume_tracing_df = pd.read_csv(os.path.join(self.data_dir, 'VolumeTracings.csv'))
 
             stages = ['ES', 'ED']
 
