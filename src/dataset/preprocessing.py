@@ -1,7 +1,6 @@
 from abstractions import PreprocessorBase
 from abstractions.utils import ConfigStruct
 import tensorflow as tf
-from skimage.color import rgb2gray
 
 
 class PreprocessorTF(PreprocessorBase):
@@ -80,10 +79,10 @@ class PreprocessorTF(PreprocessorBase):
         self.input_w = config.input_width
         self.batch_size = config.batch_size
 
-        self.do_resizing = config.do_resizing
-        self.do_normalization = config.do_normalization
-        self.min = config.min
-        self.max = config.max
+        self.do_resizing = config.preprocessor.do_resizing
+        self.do_normalization = config.preprocessor.do_normalization
+        self.min = config.preprocessor.min
+        self.max = config.preprocessor.max
 
     def _set_defaults(self):
         self.normalize_by = 255
