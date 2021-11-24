@@ -42,6 +42,12 @@ model_builder:
 # Parameters for instantiating Preprocessor
 preprocessor:
   normalization_type: null
+  format: "gray_scale"
+  max: 255
+  min: 0
+  do_resizing: True
+  do_normalization: True
+
 
 # Parameters for instantiating augmentation
 do_train_augmentation: True

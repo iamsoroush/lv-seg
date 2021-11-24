@@ -29,7 +29,7 @@ class DatasetGenerator(tf.keras.utils.Sequence):
                  to_fit=True,
                  shuffle=True,
                  seed=None,
-                 istest=False,
+                 is_test=False,
                  test_indices=None):
 
         """
@@ -61,7 +61,7 @@ class DatasetGenerator(tf.keras.utils.Sequence):
         self.shuffle = shuffle
         self.to_fit = to_fit
         self.batch_index = 0
-        self.istest = istest
+        self.is_test = is_test
         self.test_indices = test_indices
 
     def __getitem__(self, index):
@@ -88,9 +88,9 @@ class DatasetGenerator(tf.keras.utils.Sequence):
         x = self.generate_x(batch_image_dir)
 
         #indicating third element of tuple
-        if self.istest == False:
+        if not self.is_test:
           third_element = 1
-        elif self.istest == True:
+        elif self.is_test:
           third_element = int(self.test_indices[indexes].values)
         # returning the data using the selected indexes
         if self.to_fit:

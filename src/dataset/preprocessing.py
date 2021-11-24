@@ -30,8 +30,7 @@ class Preprocessor(PreprocessorBase):
         """
         super().__init__(config)
         self._load_params(config)
-        # Augmentation
-        self.aug = Augmentation(config)
+        self.batch_size = config.batch_size
 
     def image_preprocess(self, image):
 
@@ -104,8 +103,9 @@ class Preprocessor(PreprocessorBase):
         while True:
             batch = next(generator)
             label = batch[1]
+            third_element = batch[2]
             pre_processed_batch = self.batch_preprocess(batch)
-            pre_processed_batch = (pre_processed_batch[0], label)
+            pre_processed_batch = (pre_processed_batch[0], label, third_element)
             yield pre_processed_batch
 
     def add_label_preprocess(self, generator):
@@ -113,12 +113,26 @@ class Preprocessor(PreprocessorBase):
         while True:
             batch = next(generator)
             image = batch[0]
+            third_element = batch[2]
             pre_processed_batch = self.batch_preprocess(batch)
-            pre_processed_batch = (image, pre_processed_batch[1])
+            pre_processed_batch = (image, pre_processed_batch[1], third_element)
             yield pre_processed_batch
 
     def batchify(self, generator, n_data_points):
-        pass
+        n_iter = n_data_points // self.batch_size + int((n_data_points % self.batch_size) > 0)
+        gen = self._batch_gen(generator, self.batch_size)
+        return gen, n_iter
+
+    @staticmethod
+    def _batch_gen(generator, batch_size):
+        while True:
+            x_b, y_b, z_b = list(), list(), list()
+            for i in range(batch_size):
+                x, y, z = next(generator)
+                x_b.append(x)
+                y_b.append(y)
+                z_b.append(z)
+            yield np.array(x_b), np.array(y_b), np.array(z_b)
 
     def add_preprocess(self, generator, n_data_points):
 
@@ -130,19 +144,20 @@ class Preprocessor(PreprocessorBase):
         :return: preprocessed_gen: preprocessed generator, data generator < class DataGenerator >
         """
 
-        while True:
-            batch = next(generator)
-            pre_processed_batch = self.batch_preprocess(batch)
-            yield pre_processed_batch
+        generator = self.add_image_preprocess(generator)
+        generator = self.add_label_preprocess(generator)
+        generator, n_iter = self.batchify(generator, n_data_points)
+
+        return generator, n_iter
 
     def _load_params(self, config):
 
-        self.input_h = config.input_h
-        self.input_w = config.input_w
-        self.max = config.pre_process.max
-        self.min = config.pre_process.min
-        self.do_resizing = config.pre_process.do_resizing
-        self.do_normalization = config.pre_process.do_normalization
+        self.input_h = config.input_height
+        self.input_w = config.input_width
+        self.max = config.preprocessor.max
+        self.min = config.preprocessor.min
+        self.do_resizing = config.preprocessor.do_resizing
+        self.do_normalization = config.preprocessor.do_normalization
 
     def _set_defaults(self):
         self.input_h = 256

@@ -48,6 +48,7 @@ class Augmentor(AugmentorBase):
         # changing the type of the images for albumentation
         x = batch[0]
         y = batch[1]
+        z = batch[2]
 
         if 'list' in str(type(x)) or 'list' in str(type(y)):
             x = np.array(x, dtype='float32')
@@ -57,14 +58,13 @@ class Augmentor(AugmentorBase):
 
         # implementing augmentation on every image and mask of the batch
         for i in range(len(x)):
-            transformed = self.transform(image=x[i], mask=y[i])
-            x[i] = transformed['image']
-            y[i] = transformed['mask']
+            transformed = self.transform(image=x, mask=y)
+            x = transformed['image']
+            y = transformed['mask']
 
-        return x, y
+        return x, y, z
 
     def add_augmentation(self, generator):
-
         """
 
         Args:
@@ -84,17 +84,12 @@ class Augmentor(AugmentorBase):
     def _load_params(self, config):
 
         aug_config = config.augmentator
-
         self.rotation_range = aug_config.rotation_range
         self.rotation_proba = aug_config.rotation_proba
         self.flip_proba = aug_config.flip_proba
-        self.do_train_augmentation = config.do_train_augmentation
-        self.do_validation_augmentation = config.do_validation_augmentation
 
     def _set_defaults(self):
 
         self.rotation_range = 45
         self.rotation_proba = 0.5
         self.flip_proba = 0.5
-        self.do_train_augmentation = True
-        self.do_validation_augmentation = False

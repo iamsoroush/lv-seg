@@ -162,9 +162,9 @@ class DataLoader(DataLoaderBase):
                                          self.n_channels,
                                          self.to_fit,
                                          shuffle=False,
-                                         istest=True,
+                                         is_test=True,
                                          test_indices=self.test_indices)
-        test_n = test_data_gen.get_n_iter()
+        test_n = len(self.test_indices)
         return test_data_gen, test_n
 
     @property
