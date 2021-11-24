@@ -45,10 +45,10 @@ class PreprocessorTF(PreprocessorBase):
         return generator.map(self._wrapper_label_preprocess)
 
     def batchify(self, generator, n_data_points):
-        generator = generator.batch(self.batch_size, drop_remainder=True)
-        step_per_epoch = n_data_points / self.batch_size
+        generator = generator.batch(self.batch_size).repeat()
+        n_iter = n_data_points // self.batch_size + int((n_data_points % self.batch_size) > 0)
 
-        return generator, step_per_epoch
+        return generator, n_iter
 
     def _resize(self, image):
         image_resized = tf.image.resize(image, self.target_size,
