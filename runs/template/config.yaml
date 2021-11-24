@@ -24,7 +24,6 @@ data_loader:
   shuffle: True # on training data
   split_ratio: 0.9
   to_fit: True
-  seed: 101
   dataset_features:
     age: [ 18, 100 ]
     sex: [ "M", "F" ]

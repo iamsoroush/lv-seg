@@ -89,12 +89,12 @@ class DataLoader(DataLoaderBase):
         self.stage = cfg_dl.dataset_features.stage
         self.view = cfg_dl.dataset_features.view
         self.batch_size = 1
-        self.input_h = config.input_h
-        self.input_w = config.input_w
+        self.input_h = config.input_height
+        self.input_w = config.input_width
         # self.input_size = (self.input_h, self.input_w)
-        self.n_channels = config.n_channels
+        self.n_channels = 1
         # self.split_ratio = cfg_dh.split_ratio
-        self.seed = cfg_dl.seed
+        self.seed = config.seed
         self.shuffle = cfg_dl.shuffle
         self.to_fit = cfg_dl.to_fit
         self.info_df_dir = os.path.join(self.data_dir, 'info_df.csv')
@@ -161,7 +161,9 @@ class DataLoader(DataLoaderBase):
                                          self.input_size,
                                          self.n_channels,
                                          self.to_fit,
-                                         shuffle=False)
+                                         shuffle=False,
+                                         istest=True,
+                                         test_indices=self.test_indices)
         test_n = test_data_gen.get_n_iter()
         return test_data_gen, test_n
 
@@ -348,4 +350,3 @@ class DataLoader(DataLoaderBase):
 
     def get_validation_index(self):
         return self.val_indices
-
