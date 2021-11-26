@@ -27,6 +27,7 @@ data_loader:
   shuffle: True # on training data
   to_fit: True
   seed: 101
+  sample_weights: [1, 1]
   dataset_features:
     stage: ["ES", "ED"]
     view: ["4CH"]
@@ -41,6 +42,10 @@ model_builder:
 # Parameters for instantiating Preprocessor
 preprocessor:
   normalization_type: null
+  max: 255
+  min: 0
+  do_resizing: True
+  do_normalization: True
 
 # Parameters for instantiating augmentation
 do_train_augmentation: True

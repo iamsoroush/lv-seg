@@ -97,6 +97,7 @@ class EchoNetDataLoader:
         # self.input_size = (self.input_h, self.input_w)
         # self.n_channels = config.n_channels
         # self.split_ratio = cfg_dl.split_ratio
+        self.sample_weights = cfg_dl.sample_weights
         self.seed = cfg_dl.seed
         self.shuffle = cfg_dl.shuffle
         self.to_fit = cfg_dl.to_fit
@@ -109,30 +110,16 @@ class EchoNetDataLoader:
 
         self.stage = ['ED', 'ES']
         self.view = ['4CH']
-
         self.batch_size = 8
         self.input_h = 128
         self.input_w = 128
         self.n_channels = 1
         self.seed = 101
+        self.sample_weights = None
         self.shuffle = True
         self.to_fit = True
         self.dataset_dir = 'EchoNet-Dynamic'
         self.info_df_dir = os.path.join(self.dataset_dir, 'info_df.csv')
-
-    # def _load_data(self, x, y):
-    #     x = x.numpy().decode("utf-8")
-    #     print(x)
-    #     y = y.numpy().decode("utf-8")
-    #     print(y)
-    #     image = io.imread(x, plugin='simpleitk')
-    #     label = io.imread(y, plugin='simpleitk')
-    #
-    #     # image = tf.cast(image, tf.float32)
-    #     return image, label
-    #
-    # def func_(self, x, y):
-    #     return tf.py_function(self._load_data, (x, y), (tf.float32, tf.uint8))
 
     def create_train_data_generator(self):
 
@@ -141,7 +128,7 @@ class EchoNetDataLoader:
         # train_data_gen = tf.data.Dataset.from_tensor_slices((self.x_train_dir, self.y_train_dir))
         # print(self.list_images_dir)
         # print(self.list_labels_dir)
-        dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.batch_size)
+        dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.batch_size, self.sample_weights)
         train_data_gen = dataset_creator.load_process()
         n_iter_train = dataset_creator.get_n_iter()
         return train_data_gen, n_iter_train
@@ -153,7 +140,7 @@ class EchoNetDataLoader:
         Here we will set shuffle=False because we don't need shuffling for validation data.
         """
 
-        dataset_creator = DataSetCreator(self.x_val_dir, self.y_val_dir, self.batch_size)
+        dataset_creator = DataSetCreator(self.x_val_dir, self.y_val_dir, self.batch_size, self.sample_weights)
         val_data_gen = dataset_creator.load_process()
         n_iter_val = dataset_creator.get_n_iter()
         return val_data_gen, n_iter_val
@@ -167,7 +154,7 @@ class EchoNetDataLoader:
         :returns n_iter_dataset: number of iterations per epoch for train_data_gen
         """
 
-        dataset_creator = DataSetCreator(self.x_test_dir, self.y_test_dir, self.batch_size)
+        dataset_creator = DataSetCreator(self.x_test_dir, self.y_test_dir, self.batch_size, to_fit=False)
         test_data_gen = dataset_creator.load_process()
         n_iter_test = dataset_creator.get_n_iter()
         return test_data_gen, n_iter_test

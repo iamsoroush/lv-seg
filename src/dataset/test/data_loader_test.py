@@ -15,9 +15,9 @@ class TestClass:
     @pytest.fixture
     def config(self):
         root_dir = os.path.abspath(os.curdir)
-        if 'echotrain' not in root_dir:
-            root_dir = os.path.join(root_dir, 'echotrain').replace('\\', '/')
-        config_path = os.path.join(root_dir, "config/config_example_echonet.yaml")
+        if 'lv-seg' not in root_dir:
+            root_dir = os.path.join(root_dir, 'lv-seg').replace('\\', '/')
+        config_path = os.path.join(root_dir, "../../../runs/template/config.yaml")
         config = load_config_file(config_path)
         return config
 
@@ -57,18 +57,47 @@ if __name__ == '__main__':
     config = load_config_file(config_path)
 
     dataset_obj = EchoNetDataLoader(config)
-    train_gen, n_iter = dataset_obj.create_train_data_generator()
-    print(n_iter)
+    train_gen, train_n_iter = dataset_obj.create_train_data_generator()
+    val_gen, val_n_iter = dataset_obj.create_validation_data_generator()
+    test_gen, test_n_iter = dataset_obj.create_test_data_generator()
+    print(train_n_iter)
 
-    # list_dataset = list(train_gen.as_numpy_iterator())
-    for i, ele in zip(range(0, 2), train_gen):
+    for i, ele in zip(range(0, 1), train_gen):
         print(i)
         print(len(ele[0]))
         print(ele[0].numpy().shape)
         first_img = ele[0][0]
         img_label = ele[1][0]
+        img_weights = ele[2][0]
+        fig, ax = plt.subplots(1, 3)
+        ax[0].imshow(first_img)
+        ax[1].imshow(img_label)
+        ax[2].imshow(img_weights)
+        plt.show()
+
+    for i, ele in zip(range(0, 1), val_gen):
+        print(i)
+        print(len(ele[0]))
+        print(ele[0].numpy().shape)
+        first_img = ele[0][0]
+        img_label = ele[1][0]
+        img_weights = ele[2][0]
+        fig, ax = plt.subplots(1, 3)
+        ax[0].imshow(first_img)
+        ax[1].imshow(img_label)
+        ax[2].imshow(img_weights)
+        plt.show()
+
+    # list_dataset = list(train_gen.as_numpy_iterator())
+    for i, ele in zip(range(0, 1), test_gen):
+        print(i)
+        print(len(ele[0]))
+        print(ele[0].numpy().shape)
+        first_img = ele[0][0]
+        img_label = ele[1][0]
+        img_id = ele[2][0]
         fig, ax = plt.subplots(1, 2)
         ax[0].imshow(first_img)
         ax[1].imshow(img_label)
         plt.show()
-        # print(len(ele[1]))
+        print(img_id)
