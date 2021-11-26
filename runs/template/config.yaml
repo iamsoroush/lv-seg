@@ -21,7 +21,15 @@ batch_size: 8
 
 # Parameters for instantiating DataLoader
 data_loader:
+  target_dataset_name: "EchoNet_Dynamic"
+  dataset_dir: 'D:\AIMedic\FinalProject_echocardiogram\echoC_Dataset\echonet_dynamic\EchoNet-Dynamic'
+  batch_size: 8
   shuffle: True # on training data
+  to_fit: True
+  seed: 101
+  dataset_features:
+    stage: ["ES", "ED"]
+    view: ["4CH"]
 
 # Parameters for model-builder
 model_builder:
