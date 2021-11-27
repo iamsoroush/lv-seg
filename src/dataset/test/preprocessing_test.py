@@ -4,7 +4,9 @@ from echotrain.dataset.dataset_echonet import EchoNetDataset
 from echotrain.dataset.dataset_generator import DatasetGenerator
 from echotrain.model.pre_processing import PreProcessor
 from echotrain.utils import load_config_file
-from .preprocessing import Preprocessor
+from src.dataset.preprocessing import Preprocessor
+import pytest
+from src.dataset.dataset import DataLoader
 
 
 class TestClass:
@@ -20,7 +22,7 @@ class TestClass:
 
     @pytest.fixture
     def dataset(self, config):
-        dataset = EchoNetDataset(config)
+        dataset = DataLoader(config, data_dir='/content/EchoNet-Dynamic')
         return dataset
 
     @pytest.fixture
@@ -75,6 +77,7 @@ class TestClass:
 
         # Normalization
         assert 0 <= pre_processed_batch[0][0].all() <= 1
+#############################################
 
     @pytest.mark.parametrize("add_augmentation", [
         True,
@@ -94,8 +97,3 @@ class TestClass:
 
         # Normalization
         assert 0 <= pre_processed_batch[0][0].all() <= 1
-
-
-
-
-

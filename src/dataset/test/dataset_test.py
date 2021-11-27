@@ -1,20 +1,28 @@
 from abstractions import DataLoaderBase
-from src.dataset.dataset_generator import DatasetGenerator
+from .dataset_generator import DatasetGenerator
 import os
 from echotrain.dataset.dataset_echonet import EchoNetDataset
 from echotrain.utils import load_config_file
 import pytest
-from src.dataset.dataset import DataLoader
+from .dataset import DataLoader
 
 
 class TestClass:
 
+    # @pytest.fixture
+    # def config(self):
+    #     root_dir = os.path.abspath(os.curdir)
+    #     if 'echotrain' not in root_dir:
+    #         root_dir = os.path.join(root_dir, 'echotrain').replace('\\', '/')
+    #     config_path = os.path.join(root_dir, "config/config_example_echonet.yaml")
+    #     config = load_config_file(config_path)
+    #     return config
     @pytest.fixture
     def config(self):
         root_dir = os.path.abspath(os.curdir)
-        if 'echotrain' not in root_dir:
-            root_dir = os.path.join(root_dir, 'echotrain').replace('\\', '/')
-        config_path = os.path.join(root_dir, "config/config_example_echonet.yaml")
+        if 'lv-seg' not in root_dir:
+            root_dir = os.path.join(root_dir, 'lv-seg').replace('\\', '/')
+        config_path = os.path.join(root_dir, "config/runs/template/config.yaml")
         config = load_config_file(config_path)
         return config
 
