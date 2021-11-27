@@ -27,7 +27,7 @@ data_loader:
   shuffle: True # on training data
   to_fit: True
   seed: 101
-  sample_weights: [1, 1]
+  sample_weights: [1, 10]
   dataset_features:
     stage: ["ES", "ED"]
     view: ["4CH"]

@@ -61,8 +61,8 @@ class DataSetCreator:
         self.loaded_dataset = self.loaded_dataset.cache()
 
         # Create batches
-        self.loaded_dataset = self.loaded_dataset.repeat()
-        self.loaded_dataset = self.loaded_dataset.batch(self.batch_size)
+        # self.loaded_dataset = self.loaded_dataset.repeat()
+        # self.loaded_dataset = self.loaded_dataset.batch(self.batch_size)
 
         # Make dataset fetch batches in the background during the training of the model.
         self.loaded_dataset = self.loaded_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)

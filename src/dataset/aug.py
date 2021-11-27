@@ -1,18 +1,23 @@
 from functools import partial
-
+import os
+import sys
 import tensorflow as tf
-
+from matplotlib import pyplot as plt
+import numpy as np
 from abc import ABC
-from abstractions.augmentor import AugmentorBase
+# from abstractions.augmentor import AugmentorBase
 from tensorflow.python.data import AUTOTUNE
-
-from data_loader import EchoNetDataLoader
+sys.path.append(os.path.abspath('../../src'))
+print(os.path.abspath('../../src'))
+# sys.path.append(os.path.abspath('../lv_seg/'))
+from dataset.data_loader import EchoNetDataLoader
 import albumentations as A
 from albumentations import (
     Compose)
 
 
-class Aug(AugmentorBase, ABC):
+# (AugmentorBase, ABC)
+class Aug:
     """
     this class aims to implement augmentation on train and validation data
 
@@ -22,6 +27,8 @@ class Aug(AugmentorBase, ABC):
     train_data_augmented = augmentation.add_augmentation(train_dataset)
     val_data_augmented = augmentation.add_augmentation(val_dataset)
     """
+    def __init__(self):
+        self._set_defaults()
 
     def _set_defaults(self):
         """
@@ -45,7 +52,7 @@ class Aug(AugmentorBase, ABC):
         self.rotation_range = config.augmentator.rotation_range
         self.flip = config.augmentator.flip_proba
 
-    def aug_fn(self, image, label):
+    def aug_fn(self, image, label, weight):
         """
         this method is the augmentor, we define the augmentation in here
         :param image: image of dataset
@@ -53,52 +60,71 @@ class Aug(AugmentorBase, ABC):
         :param weight: sample weight
         :return: the augmented image and label, and the sample weight
         """
-        print("badddddddd")
+        # print(image.shape)
+        # print(label.shape)
+        # print(weight.shape)
+        # print(type(image))
+        # print(type(label))
+        # print(type(weight))
+        image = image.numpy()
+        label = label.numpy()
+        weight = weight.numpy()
+        # print('after:',  type(image))
+        # print('after:', type(label))
         transforms = Compose([
             A.Rotate(limit=self.rotation_range, p=self.rotation_proba),
             A.HorizontalFlip(p=self.flip),
             A.Transpose(p=0.5),
-            A.OneOf([
-                A.MotionBlur(p=0.2),
-                A.MedianBlur(blur_limit=3, p=0.1),
-                A.Blur(blur_limit=3, p=0.1),
-            ], p=0.2),
-            A.OpticalDistortion(p=0.3),
-            # A.CLAHE(clip_limit=2, p=1),
-            A.OneOf([
-                A.IAASharpen(p=0.5),
-                A.IAAEmboss(p=0.5),
-                A.RandomBrightnessContrast(p=0.5),
-            ], p=0.3)
-        ])
-        print("goooooddddddd111111")
-        image = {"image": image}
-        label = {"image": label}
-        aug_data = transforms(image, label)
-        print(type(aug_data))
-        print("hiiiiiiiiiiiiiiiiiiiiiiii")
-        aug_img = aug_data["image","mask"]
-        aug_img = tf.cast(aug_img, tf.float32)
+            # A.OneOf([
+            #     A.MotionBlur(p=0.2),
+            #     A.MedianBlur(blur_limit=3, p=0.1),
+            #     A.Blur(blur_limit=3, p=0.1),
+            # ], p=0.2),
+            # A.OpticalDistortion(p=0.3),
+            # # A.CLAHE(clip_limit=2, p=1),
+            # A.OneOf([
+            #     A.IAASharpen(p=0.5),
+            #     A.IAAEmboss(p=0.5),
+            #     A.RandomBrightnessContrast(p=0.5),
+            # ], p=0.3)
+        ], additional_targets={
+            'image1': 'image',
+            'mask1': 'mask',
+            'mask2': 'mask'
+        })
+        # print('after_1:', type(image))
+        aug_data = {"image": image,
+                    "mask1": label,
+                    "mask2": weight}
+        aug_data = transforms(**aug_data)
+        # print('type(aug_data)', type(aug_data))
+        # print('aug_data', aug_data)
+        aug_img, aug_label, aug_weight = aug_data["image"], aug_data["mask1"], aug_data["mask2"]
+        # print('np.amax(aug_label):', np.amax(aug_label))
+        # print('np.amax(aug_weight):', np.amax(aug_weight))
+        # print('np.amin(aug_label):', np.amin(aug_label))
+        # print('np.amin(aug_weight):', np.amin(aug_weight))
+        # aug_img = tf.cast(aug_img, tf.float32)
 
-        return aug_img
+        return aug_img, aug_label, aug_weight
 
-    def process_data(self, image, label):
-        aug_img = tf.numpy_function(func=self.aug_fn, inp=[image, label], Tout=tf.float32)
-        print("gooooodddddd")
+    def process_data(self, image, label, weight):
+        aug_img = tf.py_function(self.aug_fn, (image, label, weight), (tf.float32, tf.float32, tf.float64))
         return aug_img
 
     @staticmethod
-    def image_augmentation(image, label):
+    def image_augmentation(image, label, weight):
         """
 
         :param image:
         :param label:
+        :param weight:
         :return:
         """
         image = tf.image.flip_left_right(image)
         image = tf.image.random_contrast(image, 0.2, 0.5)
 
-        return image, label
+        return image, label, weight
 
     def add_augmentation(self, data):
 
@@ -109,9 +135,7 @@ class Aug(AugmentorBase, ABC):
         :yield: the batches of the augmented generator
         """
         if self.do_aug_train:
-            print("goodddddd")
-        data=data.map(partial(self.process_data), num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
-        print("goodddddd")
+            data = data.map(self.process_data, num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
         return data
 
     def add_validation_augmentation(self, data):
@@ -125,6 +149,7 @@ class Aug(AugmentorBase, ABC):
             data.map(partial(self.process_data), num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
 
         return data
+
 
 import os
 import sys
@@ -149,9 +174,23 @@ with open(utils_dir) as f:
 config = Struct(**data_map)
 
 dataset = EchoNetDataLoader(config)
-train_gen, n_iter_train= dataset.create_train_data_generator()
+train_gen, n_iter_train = dataset.create_train_data_generator()
 print(type(train_gen))
 
-augmenatation = Aug(None)
-train_gen = augmenatation.add_augmentation(train_gen)
+augmenatation_ = Aug()
+train_gen = augmenatation_.add_augmentation(train_gen)
 print(type(train_gen))
+batch = next(iter(train_gen))
+for i, ele in zip(range(0, 1), train_gen):
+    print('index:', i)
+    print(ele)
+    print('len(ele):', len(ele))
+    print('ele[0].numpy().shape:', ele[0].numpy().shape)
+    first_img = ele[0]
+    img_label = ele[1]
+    img_weights = ele[2]
+    fig, ax = plt.subplots(1, 3)
+    ax[0].imshow(first_img)
+    ax[1].imshow(img_label)
+    ax[2].imshow(img_weights)
+    plt.show()
