@@ -2,22 +2,14 @@ from functools import partial
 import os
 import sys
 import tensorflow as tf
-from matplotlib import pyplot as plt
-import numpy as np
-from abc import ABC
-# from abstractions.augmentor import AugmentorBase
+from abstractions.augmentation import AugmentorBase
 from tensorflow.python.data import AUTOTUNE
-sys.path.append(os.path.abspath('../../src'))
-print(os.path.abspath('../../src'))
-# sys.path.append(os.path.abspath('../lv_seg/'))
-from dataset.data_loader import EchoNetDataLoader
 import albumentations as A
 from albumentations import (
     Compose)
 
 
-# (AugmentorBase, ABC)
-class Aug:
+class Aug(AugmentorBase):
     """
     this class aims to implement augmentation on train and validation data
 
@@ -27,8 +19,6 @@ class Aug:
     train_data_augmented = augmentation.add_augmentation(train_dataset)
     val_data_augmented = augmentation.add_augmentation(val_dataset)
     """
-    def __init__(self):
-        self._set_defaults()
 
     def _set_defaults(self):
         """
@@ -60,17 +50,11 @@ class Aug:
         :param weight: sample weight
         :return: the augmented image and label, and the sample weight
         """
-        # print(image.shape)
-        # print(label.shape)
-        # print(weight.shape)
-        # print(type(image))
-        # print(type(label))
-        # print(type(weight))
+
         image = image.numpy()
         label = label.numpy()
         weight = weight.numpy()
-        # print('after:',  type(image))
-        # print('after:', type(label))
+
         transforms = Compose([
             A.Rotate(limit=self.rotation_range, p=self.rotation_proba),
             A.HorizontalFlip(p=self.flip),
@@ -92,47 +76,33 @@ class Aug:
             'mask1': 'mask',
             'mask2': 'mask'
         })
-        # print('after_1:', type(image))
+
         aug_data = {"image": image,
                     "mask1": label,
                     "mask2": weight}
         aug_data = transforms(**aug_data)
-        # print('type(aug_data)', type(aug_data))
-        # print('aug_data', aug_data)
         aug_img, aug_label, aug_weight = aug_data["image"], aug_data["mask1"], aug_data["mask2"]
         # print('np.amax(aug_label):', np.amax(aug_label))
-        # print('np.amax(aug_weight):', np.amax(aug_weight))
-        # print('np.amin(aug_label):', np.amin(aug_label))
-        # print('np.amin(aug_weight):', np.amin(aug_weight))
-        # aug_img = tf.cast(aug_img, tf.float32)
 
         return aug_img, aug_label, aug_weight
 
     def process_data(self, image, label, weight):
+        """
+        this method is for calling a aug_fn, which is a function that takes numpy array as input
+        :param image: image of the dataset
+        :param label:  label of the dataset
+        :param weight: smaple weight
+        :return: a tuple that consists of augmented image,label,sample weight
+        """
         aug_img = tf.py_function(self.aug_fn, (image, label, weight), (tf.float32, tf.float32, tf.float64))
         return aug_img
-
-    @staticmethod
-    def image_augmentation(image, label, weight):
-        """
-
-        :param image:
-        :param label:
-        :param weight:
-        :return:
-        """
-        image = tf.image.flip_left_right(image)
-        image = tf.image.random_contrast(image, 0.2, 0.5)
-
-        return image, label, weight
 
     def add_augmentation(self, data):
 
         """
-        calling the batch_augmentation
-        :param data:
-        :param tftensor: the input of this class must be generator
-        :yield: the batches of the augmented generator
+        calling the augmentation and map the dataset to the augmentation methods
+        :param data: train dataset, type=tf.dataset
+        :return: augmented train dataset
         """
         if self.do_aug_train:
             data = data.map(self.process_data, num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
@@ -141,9 +111,9 @@ class Aug:
     def add_validation_augmentation(self, data):
 
         """
-        calling the batch_augmentation
-        :param tftensor: the input of this class must be generator
-        :yield: the batches of the augmented generator
+        calling the augmentation and map the dataset to the augmentation methods
+        :param data: val dataset, type=tf.dataset
+        :return: augmented val dataset
         """
         if self.do_aug_val:
             data.map(partial(self.process_data), num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
@@ -155,42 +125,42 @@ import os
 import sys
 import yaml
 
-class Struct:
-    def __init__(self, **entries):
-        for k, v in entries.items():
-            if isinstance(v, dict):
-                self.__dict__[k] = Struct(**v)
-            else:
-                self.__dict__[k] = v
+# class Struct:
+#     def __init__(self, **entries):
+#         for k, v in entries.items():
+#             if isinstance(v, dict):
+#                 self.__dict__[k] = Struct(**v)
+#             else:
+#                 self.__dict__[k] = v
 
-utils_dir = os.path.abspath('../../runs/template/config.yaml')
-sys.path.append(utils_dir)
-print(utils_dir)
-
-with open(utils_dir) as f:
-    # use safe_load instead load
-    data_map = yaml.safe_load(f)
-
-config = Struct(**data_map)
-
-dataset = EchoNetDataLoader(config)
-train_gen, n_iter_train = dataset.create_train_data_generator()
-print(type(train_gen))
-
-augmenatation_ = Aug()
-train_gen = augmenatation_.add_augmentation(train_gen)
-print(type(train_gen))
-batch = next(iter(train_gen))
-for i, ele in zip(range(0, 1), train_gen):
-    print('index:', i)
-    print(ele)
-    print('len(ele):', len(ele))
-    print('ele[0].numpy().shape:', ele[0].numpy().shape)
-    first_img = ele[0]
-    img_label = ele[1]
-    img_weights = ele[2]
-    fig, ax = plt.subplots(1, 3)
-    ax[0].imshow(first_img)
-    ax[1].imshow(img_label)
-    ax[2].imshow(img_weights)
-    plt.show()
+# utils_dir = os.path.abspath('../../runs/template/config.yaml')
+# sys.path.append(utils_dir)
+# print(utils_dir)
+#
+# with open(utils_dir) as f:
+#     # use safe_load instead load
+#     data_map = yaml.safe_load(f)
+#
+# config = Struct(**data_map)
+#
+# dataset = EchoNetDataLoader(config)
+# train_gen, n_iter_train = dataset.create_train_data_generator()
+# print(type(train_gen))
+#
+# augmenatation_ = Aug()
+# train_gen = augmenatation_.add_augmentation(train_gen)
+# print(type(train_gen))
+# batch = next(iter(train_gen))
+# for i, ele in zip(range(0, 1), train_gen):
+#     print('index:', i)
+#     print(ele)
+#     print('len(ele):', len(ele))
+#     print('ele[0].numpy().shape:', ele[0].numpy().shape)
+#     first_img = ele[0]
+#     img_label = ele[1]
+#     img_weights = ele[2]
+#     fig, ax = plt.subplots(1, 3)
+#     ax[0].imshow(first_img)
+#     ax[1].imshow(img_label)
+#     ax[2].imshow(img_weights)
+#     plt.show()
