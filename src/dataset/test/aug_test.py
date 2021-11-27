@@ -13,14 +13,16 @@ class TestClass:
         root_dir = os.path.abspath(os.curdir)
         if 'lv-seg' not in root_dir:
             root_dir = os.path.join(root_dir, 'lv-seg').replace('\\', '/')
-        config_path = os.path.join(root_dir, "../../../runs/template/config.yaml")
+        config_path = os.path.join(root_dir, "./runs/template/config.yaml")
+        print(config_path)
         config = load_config_file(config_path)
         return config
 
     @pytest.fixture
     def dataset(self, config):
-        dataset = EchoNetDataLoader(config)
-        dataset, n_iter = dataset.create_train_data_generator()
+        data_dir = config.data_loader.dataset_dir
+        dataset = EchoNetDataLoader(data_dir, config)
+        dataset, train_n = dataset.create_training_generator()
         return dataset
 
     @pytest.fixture
@@ -34,10 +36,10 @@ class TestClass:
         }
         return instance
 
-    @pytest.fixture
-    def data(self, generator_inputs):
-        data = DataSetCreator(**generator_inputs)
-        return data
+    # @pytest.fixture
+    # def data(self, generator_inputs):
+    #     data = DataSetCreator(**generator_inputs)
+    #     return data
 
     @pytest.fixture
     def augmentor(self, config):
