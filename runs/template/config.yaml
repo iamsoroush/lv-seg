@@ -38,6 +38,8 @@ model_builder:
     type: "adam"
     initial_lr: 0.0001
   loss_type: "binary_crossentropy"
+  metrics: ['acc']
+  inference_threshold: 0.5
 
 # Parameters for instantiating Preprocessor
 preprocessor:
