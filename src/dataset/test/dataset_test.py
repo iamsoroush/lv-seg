@@ -1,8 +1,7 @@
 import os
-from echotrain.utils import load_config_file
 import pytest
-from .dataset import DataLoader
-from .utils import *
+from src.dataset.dataset import DataLoader
+from src.utils import *
 
 
 class TestClass:
