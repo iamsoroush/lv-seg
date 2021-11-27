@@ -38,7 +38,7 @@ class PreprocessorTF(PreprocessorBase):
 
     def _wrapper_label_preprocess(self, x, y, w):
         pre_processed_y, pre_processed_w = self.label_preprocess(y, w)
-        return x, pre_processed, pre_processed_w
+        return x, pre_processed_y, pre_processed_w
 
     def add_image_preprocess(self, generator):
         return generator.map(self._wrapper_image_preprocess)
