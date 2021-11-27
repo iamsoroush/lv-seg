@@ -7,7 +7,7 @@ class PreprocessorTF(PreprocessorBase):
 
     def image_preprocess(self, image):
 
-        pre_processed_img = image = tf.reshape(image, shape=(self.input_h, self.input_w, 1))
+        pre_processed_img = tf.reshape(image, shape=(self.input_h, self.input_w, 1))
 
         # converting the images to grayscale
         if len(pre_processed_img.shape) != 2 and pre_processed_img.shape[-1] != 1:
@@ -24,11 +24,11 @@ class PreprocessorTF(PreprocessorBase):
         return pre_processed_img
 
     def label_preprocess(self, label):
-        pre_processed_img = image = tf.reshape(image, shape=(self.input_h, self.input_w, 1))
+        pre_processed_label = tf.reshape(label, shape=(self.input_h, self.input_w, 1))
         if self.do_resizing:
-            label = self._resize(label[:, :, tf.newaxis])
+            pre_processed_label = self._resize(pre_processed_label[:, :, tf.newaxis])
 
-        return label
+        return pre_processed_label
 
     def _wrapper_image_preprocess(self, x, y, w):
         pre_processed = self.image_preprocess(x)
