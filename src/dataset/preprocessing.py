@@ -92,9 +92,9 @@ class Preprocessor(PreprocessorBase):
         y = batch[1]
 
         # pre-processing every image of the batch given
-        x_preprocessed_batch = np.array(list(map(self.image_preprocess, x)))
+        x_preprocessed_batch = np.array(list(self.image_preprocess(x)))
         # the labels of the batches do not need pre-processing (yet!)
-        y_preprocessed_batch = np.array(list(map(self.label_preprocess, y)))
+        y_preprocessed_batch = np.array(list(self.label_preprocess(y)))
 
         return x_preprocessed_batch, y_preprocessed_batch
 
