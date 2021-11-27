@@ -1,4 +1,3 @@
-from functools import partial
 import os
 import sys
 import tensorflow as tf
@@ -19,7 +18,6 @@ class Aug(AugmentorBase):
     train_data_augmented = augmentation.add_augmentation(train_dataset)
     val_data_augmented = augmentation.add_augmentation(val_dataset)
     """
-
     def _set_defaults(self):
         """
         this method use the default values for augmentation in case the input of Aug class is None

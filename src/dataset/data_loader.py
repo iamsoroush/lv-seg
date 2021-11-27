@@ -1,16 +1,17 @@
 # requirements
 
-# from abstractions.data_loader import DataLoaderBase
+from abstractions.data_loading import DataLoaderBase
 from dataset.tf_data_pipeline import DataSetCreator
 import tensorflow as tf
 import random
 import numpy as np
 import pandas as pd
 import os
+import pathlib
 from tqdm import tqdm
 
 
-class EchoNetDataLoader:
+class EchoNetDataLoader(DataLoaderBase):
 
     """
     This class makes our dataset ready to use by giving desired values to its parameters
@@ -45,14 +46,15 @@ class EchoNetDataLoader:
 
     """
 
-    def __init__(self, config=None):
+    def __init__(self, data_dir: pathlib.Path, config=None):
 
         """
         Handles data loading: loading, preparing, data generators
         """
 
         # super().__init__(config)
-        self._load_params(config)
+        super().__init__(config, data_dir)
+        # self._load_params(config)
 
         self.df_dataset = None
         self._build_data_frame()
@@ -121,7 +123,7 @@ class EchoNetDataLoader:
         self.dataset_dir = 'EchoNet-Dynamic'
         self.info_df_dir = os.path.join(self.dataset_dir, 'info_df.csv')
 
-    def create_train_data_generator(self):
+    def create_training_generator(self):
 
         """Train data generator"""
 
@@ -130,22 +132,20 @@ class EchoNetDataLoader:
         # print(self.list_labels_dir)
         dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.batch_size, self.sample_weights)
         train_data_gen = dataset_creator.load_process()
-        n_iter_train = dataset_creator.get_n_iter()
-        return train_data_gen, n_iter_train
+        train_n = len(train_data_gen)
+        return train_data_gen, train_n
 
-    def create_validation_data_generator(self):
+    def create_validation_generator(self):
 
         """Validation data generator
-
         Here we will set shuffle=False because we don't need shuffling for validation data.
         """
-
         dataset_creator = DataSetCreator(self.x_val_dir, self.y_val_dir, self.batch_size, self.sample_weights)
         val_data_gen = dataset_creator.load_process()
-        n_iter_val = dataset_creator.get_n_iter()
-        return val_data_gen, n_iter_val
+        val_n = len(val_data_gen)
+        return val_data_gen, val_n
 
-    def create_test_data_generator(self):
+    def create_test_generator(self):
 
         """
         Creates data generators based on batch_size, input_size
@@ -156,8 +156,11 @@ class EchoNetDataLoader:
 
         dataset_creator = DataSetCreator(self.x_test_dir, self.y_test_dir, self.batch_size, to_fit=False)
         test_data_gen = dataset_creator.load_process()
-        n_iter_test = dataset_creator.get_n_iter()
-        return test_data_gen, n_iter_test
+        test_n = len(test_data_gen)
+        return test_data_gen, test_n
+
+    def get_validation_index(self):
+        return self.val_df_['case_id']
 
     @property
     def raw_df(self):

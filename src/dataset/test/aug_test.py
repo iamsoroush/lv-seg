@@ -1,11 +1,9 @@
 import os
 import pytest
-print('\N{T-Rex}')
 from ..data_loader import EchoNetDataLoader
 from ..data_loader import DataSetCreator
 from dataset.aug import Aug
 from utils import load_config_file
-
 
 
 class TestClass:
@@ -33,7 +31,6 @@ class TestClass:
             'batch_size': dataset.batch_size,
             'sample_weights': dataset.sample_weights,
             'to_fit': dataset.to_fit,
-
         }
         return instance
 

@@ -8,11 +8,8 @@ class DataSetCreator:
         # self.dataset = dataset
         self.list_images_dir = list_images_dir
         self.list_labels_dir = np.array(list(map(lambda x: list_labels_dir[x], self.list_images_dir)))
-        # print(type(self.list_images_dir), type(self.list_labels_dir))
-        # print(self.list_images_dir.shape, self.list_labels_dir.shape)
         self.dataset = tf.data.Dataset.from_tensor_slices((self.list_images_dir, self.list_labels_dir))
         self.batch_size = batch_size
-        # print(sample_weights)
         self.sample_weights = sample_weights
         self.to_fit = to_fit
 
@@ -67,9 +64,3 @@ class DataSetCreator:
         # Make dataset fetch batches in the background during the training of the model.
         self.loaded_dataset = self.loaded_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         return self.loaded_dataset
-
-    def get_n_iter(self):
-        return int(tf.math.ceil(len(self.list_images_dir) / self.batch_size))
-
-    def get_batch(self):
-        return next(iter(self.loaded_dataset))
