@@ -7,7 +7,7 @@ class PreprocessorTF(PreprocessorBase):
 
     def image_preprocess(self, image):
 
-        pre_processed_img = image
+        pre_processed_img = image = tf.reshape(image, shape=(self.input_h, self.input_w, 1))
 
         # converting the images to grayscale
         if len(pre_processed_img.shape) != 2 and pre_processed_img.shape[-1] != 1:
@@ -24,6 +24,7 @@ class PreprocessorTF(PreprocessorBase):
         return pre_processed_img
 
     def label_preprocess(self, label):
+        pre_processed_img = image = tf.reshape(image, shape=(self.input_h, self.input_w, 1))
         if self.do_resizing:
             label = self._resize(label[:, :, tf.newaxis])
 
@@ -50,7 +51,7 @@ class PreprocessorTF(PreprocessorBase):
         return generator, n_iter
 
     def _resize(self, image):
-        image_resized = tf.image.resize(image, self.target_size,
+        image_resized = tf.image.resize(image, [self.input_h, self.input_w],
                                         antialias=False,
                                         method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
         return image_resized
@@ -74,7 +75,7 @@ class PreprocessorTF(PreprocessorBase):
         return gen, n_iter
 
     def _load_params(self, config: ConfigStruct):
-        self.normalize_by = config.preprocessor.normalize_by
+        # self.normalize_by = config.preprocessor.normalize_by
         self.input_h = config.input_height
         self.input_w = config.input_width
         self.batch_size = config.batch_size
@@ -85,9 +86,9 @@ class PreprocessorTF(PreprocessorBase):
         self.max = config.preprocessor.max
 
     def _set_defaults(self):
-        self.normalize_by = 255
-        self.input_h = 28
-        self.input_w = 28
+        # self.normalize_by = 255
+        self.input_h = 128
+        self.input_w = 128
         self.batch_size = 8
 
         self.do_resizing = True
