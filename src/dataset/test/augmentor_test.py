@@ -2,9 +2,7 @@ import os
 from dataset.augmentor import Augmentor
 import pytest
 from dataset.dataset import DataLoader
-from abstractions import DataLoaderBase
 from dataset.dataset_generator import DatasetGenerator
-import random
 from utils import *
 
 
