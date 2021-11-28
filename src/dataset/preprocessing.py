@@ -6,9 +6,9 @@ from skimage.color import rgb2gray
 
 class Preprocessor(PreprocessorBase):
     """
-     PreProcess module used for images, batches, generators
+     PreProcessing module used for images, batches, generators
 
-    Example::
+    Example:
 
         preprocessor = PreProcess()
         image = preprocessor.img_preprocess(image)
@@ -26,8 +26,6 @@ class Preprocessor(PreprocessorBase):
 
     def __init__(self, config):
 
-        """
-        """
         super().__init__(config)
         self._load_params(config)
         self.batch_size = config.batch_size
@@ -36,11 +34,12 @@ class Preprocessor(PreprocessorBase):
 
         """
         pre-processing on input image
+        Args:
+            image: input image, np.array
 
-        :param image: input image, np.array
-        :param inference: resize if the user is in inference phase
 
-        :return: pre_processed_img
+        Returns:
+            pre_processed_img
         """
 
         pre_processed_img = image.copy()
@@ -63,10 +62,11 @@ class Preprocessor(PreprocessorBase):
 
         """
         pre-processing on input label
+        Args:
+            label: input label, np.array
 
-        :param label: input label, np.array
-
-        :return: pre-processed label
+        Returns:
+            pre-processed label
         """
 
         if self.do_resizing:
@@ -78,11 +78,14 @@ class Preprocessor(PreprocessorBase):
 
         """
         batch pre_processing function
+        Args:
+            batch: input batch (X, y)
 
-        :param batch: input batch (X, y)
+        Returns:
+            tuple(x_preprocessed_batch, y_preprocessed_batch):
+            - x_preprocessed_batch: preprocessed batch for x
 
-        :return: x_preprocessed_batch: preprocessed batch for x
-        :return: y_preprocessed_batch: preprocessed batch for y
+            - y_preprocessed_batch: preprocessed batch for y
         """
 
         # images of the give batch
@@ -99,6 +102,19 @@ class Preprocessor(PreprocessorBase):
         return x_preprocessed_batch, y_preprocessed_batch
 
     def add_image_preprocess(self, generator):
+        """
+        Plugs input-image-preprocessing on top of the given generator
+        Args:
+            generator: a `Python generator` which yields a single data-point ``(x, y, sample_weight)`` or ``(x, y, data_id)`` if it is ``test_data_generator`` in which
+
+                - ``x`` => input image,
+                - ``y`` => label, or segmentation map for segmentation
+                - ``sample_weight`` => float (classification/segmentation), or one-channel segmentation map (segmentation)
+
+        Returns:
+            A ``generator` with preprocessed ``x`` s
+
+        """
 
         while True:
             batch = next(generator)
@@ -109,7 +125,19 @@ class Preprocessor(PreprocessorBase):
             yield pre_processed_batch
 
     def add_label_preprocess(self, generator):
+        """
+        Plugs input-label-preprocessing on top of the given ``generator``
+        Args:
+            generator: a ``Python generator`` which yields a single data-point ``(x, y, sample_weight)`` or ``(x, y, data_id)`` if it is ``test_data_generator`` in which
 
+                - ``x`` => input image,
+                - ``y`` => label, or segmentation map for segmentation
+                - ``sample_weight`` => float (classification/segmentation), or one-channel segmentation map (segmentation)
+
+        Returns:
+            A ``generator`` with preprocessed ``y`` s
+
+        """
         while True:
             batch = next(generator)
             image = batch[0]
@@ -119,12 +147,50 @@ class Preprocessor(PreprocessorBase):
             yield pre_processed_batch
 
     def batchify(self, generator, n_data_points):
+        """
+        Batchifies the given ``generator``
+        Args:
+            generator: a ``Python generator`` which yields a single data-point ``(x, y, sample_weight)`` or ``(x, y, data_id)`` if it is ``test_data_generator`` in which
+
+                - ``x`` => input image,
+                - ``y`` => label, or segmentation map for segmentation
+                - ``sample_weight`` => float (classification/segmentation), or one-channel segmentation map (segmentation)
+            n_data_points: number of data_points in this sub-set.
+
+        Returns:
+            tuple(batched_generator, n_iter):
+            - batched_generator: A repeated ``generator`` which yields a batch of data for each iteration, ``(x_batch, y_batch, sample_weights)`` or ``(x_batch, y_batch, data_ids)`` for test data gen, in which
+
+                - ``x`` => (batch_size, input_h, input_w, n_channels)
+                - ``y`` => classification: (batch_size, n_classes[or 1]), segmentation: (batch_size, input_h, input_w, n_classes)
+                - ``sample_weights`` => (batch_size, 1)(classification/segmentation), (batch_size, input_h, input_w, 1)(segmentation)
+
+            - n_iter: number of iterations per epoch
+
+        """
         n_iter = n_data_points // self.batch_size + int((n_data_points % self.batch_size) > 0)
         gen = self._batch_gen(generator, self.batch_size)
         return gen, n_iter
 
     @staticmethod
     def _batch_gen(generator, batch_size):
+        """
+        Helps to batchify the given ``generator``
+        Args:
+            generator: a ``Python generator`` which yields a single data-point ``(x, y, sample_weight)`` or ``(x, y, data_id)`` if it is ``test_data_generator`` in which
+
+                - ``x`` => input image,
+                - ``y`` => label, or segmentation map for segmentation
+                - ``sample_weight`` => float (classification/segmentation), or one-channel segmentation map (segmentation)
+            batch_size: size of the ``generator`` batch
+
+        Returns:
+            tuple(x, y, input_w, sample_weight):
+                - ``x`` => (batch_size, input_h, input_w, n_channels)
+                - ``y`` => classification: (batch_size, n_classes[or 1]), segmentation: (batch_size, input_h, input_w, n_classes)
+                - ``sample_weights`` => (batch_size, 1)(classification/segmentation), (batch_size, input_h, input_w, 1)(segmentation)
+
+        """
         while True:
             x_b, y_b, z_b = list(), list(), list()
             for i in range(batch_size):
@@ -136,12 +202,21 @@ class Preprocessor(PreprocessorBase):
 
     def add_preprocess(self, generator, n_data_points):
 
-        """providing the suggested pre-processing for the given generator
+        """
+        providing the suggested pre-processing for the given generator
+        Args:
+            generator: input generator ready for pre-processing, data generator < class DataGenerator >
+            n_data_points: number of data_points in this sub-set.
 
-        :param generator: input generator ready for pre-processing, data generator < class DataGenerator >
-        :param add_augmentation: pass True if your generator is train_gen
+        Returns:
+            tuple(batched_generator, n_iter):
+            - batched_generator: A repeated ``generator`` which yields a batch of data for each iteration, ``(x_batch, y_batch, sample_weights)`` or ``(x_batch, y_batch, data_ids)`` for test data gen, in which
 
-        :return: preprocessed_gen: preprocessed generator, data generator < class DataGenerator >
+                - ``x`` => (batch_size, input_h, input_w, n_channels)
+                - ``y`` => classification: (batch_size, n_classes[or 1]), segmentation: (batch_size, input_h, input_w, n_classes)
+                - ``sample_weights`` => (batch_size, 1)(classification/segmentation), (batch_size, input_h, input_w, 1)(segmentation)
+
+            - n_iter: number of iterations per epoch
         """
 
         generator = self.add_image_preprocess(generator)
@@ -152,6 +227,14 @@ class Preprocessor(PreprocessorBase):
 
     def _load_params(self, config):
 
+        """
+        Read parameters from config file.
+        Args:
+            config: dict of a config file
+
+        Returns:
+
+        """
         self.input_h = config.input_height
         self.input_w = config.input_width
         self.max = config.preprocessor.max
@@ -160,6 +243,12 @@ class Preprocessor(PreprocessorBase):
         self.do_normalization = config.preprocessor.do_normalization
 
     def _set_defaults(self):
+
+        """
+        Set default values for PreProcessing class
+        Returns:
+
+        """
         self.input_h = 256
         self.input_w = 256
         self.max = 255
@@ -169,16 +258,27 @@ class Preprocessor(PreprocessorBase):
 
     @property
     def target_size(self):
+        """
+        Return the height and width of the input data
+
+        Returns:
+             tuple(input_h, input_w):
+            - input_h: Height of the input data
+
+            - input_w: Width of the input data
+        """
         return self.input_h, self.input_w
 
     def _resize(self, image):
 
         """
         resizing image into the target_size dimensions
+        Args:
+            image: input image, np.array
 
-        :param image: input image, np.array
+        Returns:
+            resized image
 
-        :return: resized image
         """
 
         image_resized = np.array(tf.image.resize(image,
@@ -192,12 +292,13 @@ class Preprocessor(PreprocessorBase):
 
         """
         rescaling the input image
+        Args:
+            image: input image, np.array
+            min_val: minimum value of the image
+            max_val: maximum value of the image
 
-        :param image: input image, np.array
-        :param min_val: minimum value of the image
-        :param max_val: maximum value of the image
+        Returns:
 
-        :return: rescaled image
         """
 
         rescaled_image = (image - min_val) / (max_val - min_val)
@@ -209,10 +310,12 @@ class Preprocessor(PreprocessorBase):
 
         """
         converting the input image to grayscale, if needed
+        Args:
+            image: input image, np array
 
-        :param image: input image, np array
+        Returns:
+            converted image
 
-        :return: converted image
         """
 
         gray_image = rgb2gray(image)
