@@ -1,13 +1,11 @@
 import os
-from src.dataset.augmentor import Augmentor
+from dataset.augmentor import Augmentor
 import pytest
-from src.dataset.dataset import DataLoader
+from dataset.dataset import DataLoader
 from abstractions import DataLoaderBase
-from src.dataset.dataset_generator import DatasetGenerator
+from dataset.dataset_generator import DatasetGenerator
 import random
-import pytest
-from src.dataset.dataset import DataLoader
-from src.utils import *
+from utils import *
 
 
 class TestClass:

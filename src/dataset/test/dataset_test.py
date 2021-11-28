@@ -1,7 +1,7 @@
 import os
 import pytest
-from src.dataset.dataset import DataLoader
-from src.utils import *
+from dataset.dataset import DataLoader
+from utils import *
 
 
 class TestClass:
@@ -40,7 +40,6 @@ class TestClass:
         print(type(next(train_gen)[2]))
         assert 'int' in str(type(next(train_gen)[2]))
 
-
     def test_create_validation_generator(self, dataset):
         val_gen, val_n = dataset.create_validation_generator()
 
@@ -60,4 +59,3 @@ class TestClass:
         assert next(test_gen)[0].shape
         assert next(test_gen)[1].shape
         assert 'int' in str(type(next(test_gen)[2]))
-
