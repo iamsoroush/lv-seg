@@ -2,6 +2,9 @@
 seed: 101
 input_height: 128 # For resizing and model creation
 input_width: 128 # For resizing and model creation
+original_input_h : 112 # For reshaping in preprocessing
+original_input_w : 112 # For reshaping in preprocessing
+original_input_channels : 1 # For reshaping in preprocessing
 # n_channels must be set in code based on dataset and task
 
 src_code_path: 'src' # put '' if packages are in root directory of your repository
