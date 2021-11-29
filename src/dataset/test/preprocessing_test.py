@@ -35,21 +35,20 @@ class TestClass:
         preprocessor = PreprocessorTF(config)
         preprocessed_image = preprocessor.add_image_preprocess(dataset)
 
-        assert str(type(preprocessed_image)) == """<class 'tensorflow.python.data.ops.dataset_ops.MapDataset'>"""
+        assert "MapDataset" in  str(type(preprocessed_image))
 
     def test_add_label_preprocess(self, dataset, config):
         preprocessor = PreprocessorTF(config)
         preprocessed_label = preprocessor.add_label_preprocess(dataset)
 
-        assert str(type(preprocessed_label)) == """<class 'tensorflow.python.data.ops.dataset_ops.MapDataset'>"""
+        assert "MapDataset" in str(type(preprocessed_label))
 
     def test_batchify(self, config, dataset):
         preprocessor = PreprocessorTF(config)
 
         generator_batch, n_iter = preprocessor.batchify(dataset, len(dataset))
 
-        assert str(type(generator_batch)) == """tensorflow.python.data.ops.dataset_ops.RepeatDataset""" \
-               and type(n_iter) == int
+        assert type(n_iter) == int and "RepeatDataset" in str(type(generator_batch))
 
     def test_add_preprocess(self, config, dataset):
         preprocessor = PreprocessorTF(config)
@@ -57,15 +56,14 @@ class TestClass:
         gen = preprocessor.add_label_preprocess(gen)
         gen, n_iter = preprocessor.batchify(gen, len(dataset))
 
-        assert str(type(gen)) == """tensorflow.python.data.ops.dataset_ops.RepeatDataset""" \
-               and type(n_iter) == int
+        assert type(n_iter) == int and "RepeatDataset" in str(type(gen))
 
     def test_rescale(self):
         image = tf.constant([[1, 2],
                              [3, 4],
                              [5, 6]], dtype=tf.float32)
         min_val = 0
-        max_val = 0
+        max_val = 255
         rescaled_image = (image - min_val) / (max_val - min_val)
 
         assert 0 <= float(tf.reduce_max(rescaled_image)) <= 1 and 0 <= float(tf.reduce_min(rescaled_image)) <= 1
