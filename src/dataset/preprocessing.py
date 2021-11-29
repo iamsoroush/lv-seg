@@ -3,7 +3,6 @@
 import tensorflow as tf
 import os
 from .data_loader import EchoNetDataLoader
-from utils import load_config_file
 from abstractions.preprocessing import PreprocessorBase
 import matplotlib.pyplot as plt
 
