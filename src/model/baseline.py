@@ -53,14 +53,14 @@ class UNetBaselineBuilder(ModelBuilderBase):
         self.kernel_initializer = 'glorot_uniform'
 
     def _load_params(self, config):
-        self.optimizer_type = config.model.optimizer.type
-        self.learning_rate = config.model.optimizer.initial_lr
-        self.loss_type = config.model.loss_type
-        self.metrics = config.model.metrics
-        self.input_h = config.input_h
-        self.input_w = config.input_w
+        self.optimizer_type = config.model_builder.optimizer.type
+        self.learning_rate = config.model_builder.optimizer.initial_lr
+        self.loss_type = config.model_builder.loss_type
+        self.metrics = config.model_builder.metrics
+        self.input_h = config.input_height
+        self.input_w = config.input_width
         self.n_chanels = config.n_channels
-        self.inference_threshold = config.model.inference_threshold
+        self.inference_threshold = config.model_builder.inference_threshold
 
     def _set_defaults(self):
         self.optimizer_type = 'adam'

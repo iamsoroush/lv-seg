@@ -1,7 +1,7 @@
 # requirements
 
 from abstractions.data_loading import DataLoaderBase
-from dataset.tf_data_pipeline import DataSetCreator
+from .tf_data_pipeline import DataSetCreator
 import tensorflow as tf
 import random
 import numpy as np

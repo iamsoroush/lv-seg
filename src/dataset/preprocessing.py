@@ -1,10 +1,7 @@
-# from abstractions import PreprocessorBase
-# from abstractions.utils import ConfigStruct
+
 import tensorflow as tf
-import os
-from .data_loader import EchoNetDataLoader
 from abstractions.preprocessing import PreprocessorBase
-import matplotlib.pyplot as plt
+
 
 
 class PreprocessorTF(PreprocessorBase):
