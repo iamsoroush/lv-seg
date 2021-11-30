@@ -3,7 +3,6 @@ import tensorflow as tf
 from abstractions.preprocessing import PreprocessorBase
 
 
-
 class PreprocessorTF(PreprocessorBase):
 
     def image_preprocess(self, image):

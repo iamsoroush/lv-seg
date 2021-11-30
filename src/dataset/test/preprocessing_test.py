@@ -5,12 +5,9 @@ import tensorflow as tf
 
 sys.path.append(os.path.abspath('../..'))
 print(os.path.abspath('../..'))
-# sys.path.append(os.path.abspath('../lv_seg/'))
 from dataset.data_loader import EchoNetDataLoader
 from utils import load_config_file
-# from echotrain.utils import load_config_file
 import pytest
-import matplotlib.pyplot as plt
 
 
 class TestClass:

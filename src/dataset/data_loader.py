@@ -2,7 +2,6 @@
 
 from abstractions.data_loading import DataLoaderBase
 from .tf_data_pipeline import DataSetCreator
-import tensorflow as tf
 import random
 import numpy as np
 import pandas as pd
@@ -125,22 +124,28 @@ class EchoNetDataLoader(DataLoaderBase):
 
     def create_training_generator(self):
 
-        """Train data generator"""
+        """
+        Creates tf.data.Dataset for train set based on input_size
 
-        # train_data_gen = tf.data.Dataset.from_tensor_slices((self.x_train_dir, self.y_train_dir))
-        # print(self.list_images_dir)
-        # print(self.list_labels_dir)
-        dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.batch_size, self.sample_weights)
+        :returns dataset_creator: tf.data.Dataset of train set which returns (h, w, c) tensors
+        :returns test_n: number of data for test set
+        """
+
+        dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.sample_weights)
         train_data_gen = dataset_creator.load_process()
         train_n = len(train_data_gen)
         return train_data_gen, train_n
 
     def create_validation_generator(self):
 
-        """Validation data generator
-        Here we will set shuffle=False because we don't need shuffling for validation data.
         """
-        dataset_creator = DataSetCreator(self.x_val_dir, self.y_val_dir, self.batch_size, self.sample_weights)
+        Creates tf.data.Dataset for validation set based on input_size
+
+        :returns dataset_creator: tf.data.Dataset of validation set which returns (h, w, c) tensors
+        :returns val_n: number of data for test set
+        """
+
+        dataset_creator = DataSetCreator(self.x_val_dir, self.y_val_dir, self.sample_weights)
         val_data_gen = dataset_creator.load_process()
         val_n = len(val_data_gen)
         return val_data_gen, val_n
@@ -148,13 +153,13 @@ class EchoNetDataLoader(DataLoaderBase):
     def create_test_generator(self):
 
         """
-        Creates data generators based on batch_size, input_size
+        Creates tf.data.Dataset based on input_size
 
-        :returns dataset_gen: training data generator which yields (batch_size, h, w, c) tensors
-        :returns n_iter_dataset: number of iterations per epoch for train_data_gen
+        :returns dataset_creator: tf.data.Dataset of test set which returns (h, w, c) tensors
+        :returns test_n: number of data for test set
         """
 
-        dataset_creator = DataSetCreator(self.x_test_dir, self.y_test_dir, self.batch_size, to_fit=False)
+        dataset_creator = DataSetCreator(self.x_test_dir, self.y_test_dir, to_fit=False)
         test_data_gen = dataset_creator.load_process()
         test_n = len(test_data_gen)
         return test_data_gen, test_n

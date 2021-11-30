@@ -1,5 +1,3 @@
-import os
-import sys
 import tensorflow as tf
 from abstractions.augmentation import AugmentorBase
 from tensorflow.python.data import AUTOTUNE
