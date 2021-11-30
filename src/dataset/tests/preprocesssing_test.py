@@ -1,8 +1,8 @@
-from .preprocessing import Preprocessor
+from ..preprocessing import Preprocessor
 import os
-from .dataset_generator import DatasetGenerator
+from ..dataset_generator import DatasetGenerator
 import pytest
-from .dataset import DataLoader
+from ..dataset import DataLoader
 from utils import *
 import types
 

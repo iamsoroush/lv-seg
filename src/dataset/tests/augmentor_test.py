@@ -1,8 +1,8 @@
 import os
-from .augmentor import Augmentor
+from ..augmentor import Augmentor
 import pytest
-from .dataset import DataLoader
-from .dataset_generator import DatasetGenerator
+from ..dataset import DataLoader
+from ..dataset_generator import DatasetGenerator
 from utils import *
 import types
 
