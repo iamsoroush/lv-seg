@@ -89,7 +89,7 @@ class DatasetGenerator(tf.keras.utils.Sequence):
 
         #indicating third element of tuple
         if not self.is_test:
-          third_element = 1
+          third_element = np.array([1])
         elif self.is_test:
           third_element = int(self.test_indices[indexes].values)
         # returning the data using the selected indexes

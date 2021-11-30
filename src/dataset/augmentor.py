@@ -10,11 +10,9 @@ class Augmentor(AugmentorBase):
 
     Example::
 
-        aug = Augmentation()
-        data = aug.batch_augmentation(x,y)
-        x = images(batch)
-        y = masks(batch)
-        data = augmented batch
+        aug = Augmentor(config)
+        augmented_gen = aug.add_augmentation(generator)
+        augmented_val_gen = aug.add_validation_augmentation(generator)
 
     Augmentation part of config file:
 
@@ -37,12 +35,13 @@ class Augmentor(AugmentorBase):
 
         """This method implement augmentation on batches
 
-        :param batch: (x, y):
+        :param batch: (x, y, z):
             x: batch images of the whole batch
             y: batch masks of the whole batch
-
+            z: batch third element (index for test and sample weight for training set and val set
         :return x: image batch
         :return y: mask batch.
+        :return z: third element of batch.
         """
 
         # changing the type of the images for albumentation
@@ -68,10 +67,11 @@ class Augmentor(AugmentorBase):
         """
 
         Args:
-            generator:
+            generator: a generator with batch size of 1 sample that consist of a three element tuple
+            (image, label, third_element)
 
         Returns:
-
+            a generator in the shape of input with augmented image and label
         """
         while True:
             batch = next(generator)
@@ -79,6 +79,15 @@ class Augmentor(AugmentorBase):
             yield augmented_batch
 
     def add_validation_augmentation(self, generator):
+        """
+        This method is used whenever we have a unique approach for augmenting validation set
+        Args:
+            generator: a generator with batch size of 1 sample that consist of a three element tuple
+            (image, label, third_element)
+
+        Returns:
+            a generator in the shape of input with augmented image and label
+        """
         pass
 
     def _load_params(self, config):

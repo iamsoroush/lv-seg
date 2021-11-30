@@ -10,19 +10,22 @@ from tqdm import tqdm
 class DataLoader(DataLoaderBase):
 
     """
-    This class makes our dataset ready to use by giving desired values to its parameters
-    and by calling the "create_data_generators" or "create_test_data_generator" function,
+    This class makes our dataset ready to use by giving desired values to its parameters and by calling the
+    "create_training_generator", "create_validation_generator" or "create_test_generator" function,
     reads the data from the given directory as follows:
 
     Example:
 
-        dataset = EchoNetDataset(config)
+        dataset = DataLoader(config, data_dir)
 
         # for training set:
-        train_gen, val_gen, n_iter_train, n_iter_val= dataset.create_data_generators()
+        train_data_gen, n_train = dataset.create_training_generator()
+
+        #for validation set:
+        val_data_gen, val_n = dataset.create_validation_generator()
 
         # for test set:
-        test_gen = dataset.create_test_data_generator()
+        test_data_gen, test_n = dataset.create_test_generator()
 
     Attributes:
 
@@ -116,7 +119,10 @@ class DataLoader(DataLoaderBase):
 
     def create_training_generator(self):
 
-        """Train data generator"""
+        """
+        Train data generator
+        Sample weight is equal to 1 as the third parameter in generator tuple
+        """
 
         train_data_gen = DatasetGenerator(self.x_train_dir,
                                           self.y_train_dir,
@@ -134,6 +140,7 @@ class DataLoader(DataLoaderBase):
         """Validation data generator
 
         Here we will set shuffle=False because we don't need shuffling for validation data.
+        Sample weight is equal to 1 as the third parameter in generator tuple
         """
 
         val_data_gen = DatasetGenerator(self.x_val_dir,
@@ -150,6 +157,7 @@ class DataLoader(DataLoaderBase):
 
         """
         Creates data generators based on batch_size, input_size
+        Third parameter of generator tuple is the index of test data in the whole dataset.
         n_iter_val
         :returns dataset_gen: training data generator which yields (batch_size, h, w, c) tensors
         :returns n_iter_dataset: number of iterations per epoch for train_data_gen
@@ -349,4 +357,9 @@ class DataLoader(DataLoaderBase):
         self.test_indices = self.indexes[self._clean_data_df['status'] == 'TEST']
 
     def get_validation_index(self):
+        """
+
+        Returns:a list of indices of validation data in dataset
+
+        """
         return self.val_indices
