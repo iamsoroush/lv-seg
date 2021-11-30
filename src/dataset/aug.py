@@ -1,3 +1,4 @@
+from functools import partial
 import tensorflow as tf
 from abstractions.augmentation import AugmentorBase
 from tensorflow.python.data import AUTOTUNE
@@ -29,7 +30,8 @@ class Aug(AugmentorBase):
     def _load_params(self, config):
         """
         this method uses the parameters in config file for augmentation
-        :param config: config file
+        Returns:
+             config: config file
         """
         config = config
         self.do_aug_train = config.do_train_augmentation
@@ -41,10 +43,12 @@ class Aug(AugmentorBase):
     def aug_fn(self, image, label, weight):
         """
         this method is the augmentor, we define the augmentation in here
-        :param image: image of dataset
-        :param label: label of dataset
-        :param weight: sample weight
-        :return: the augmented image and label, and the sample weight
+        Args:
+            image: image of dataset
+            label: label of dataset
+            weight: sample weight
+        Returns:
+            the augmented image and label, and the sample weight
         """
 
         image = image.numpy()
@@ -55,18 +59,6 @@ class Aug(AugmentorBase):
             A.Rotate(limit=self.rotation_range, p=self.rotation_proba),
             A.HorizontalFlip(p=self.flip),
             A.Transpose(p=0.5),
-            # A.OneOf([
-            #     A.MotionBlur(p=0.2),
-            #     A.MedianBlur(blur_limit=3, p=0.1),
-            #     A.Blur(blur_limit=3, p=0.1),
-            # ], p=0.2),
-            # A.OpticalDistortion(p=0.3),
-            # # A.CLAHE(clip_limit=2, p=1),
-            # A.OneOf([
-            #     A.IAASharpen(p=0.5),
-            #     A.IAAEmboss(p=0.5),
-            #     A.RandomBrightnessContrast(p=0.5),
-            # ], p=0.3)
         ], additional_targets={
             'image1': 'image',
             'mask1': 'mask',
@@ -85,10 +77,12 @@ class Aug(AugmentorBase):
     def process_data(self, image, label, weight):
         """
         this method is for calling a aug_fn, which is a function that takes numpy array as input
-        :param image: image of the dataset
-        :param label:  label of the dataset
-        :param weight: smaple weight
-        :return: a tuple that consists of augmented image,label,sample weight
+        Args:
+            image: image of the dataset
+            label:  label of the dataset
+            weight: smaple weight
+        Returns:
+            a tuple that consists of augmented image,label,sample weight
         """
         aug_img = tf.py_function(self.aug_fn, (image, label, weight), (tf.float32, tf.float32, tf.float64))
         return aug_img
@@ -97,8 +91,10 @@ class Aug(AugmentorBase):
 
         """
         calling the augmentation and map the dataset to the augmentation methods
-        :param data: train dataset, type=tf.dataset
-        :return: augmented train dataset
+        Args:
+            data: train dataset, type=tf.dataset
+        Returns:
+            augmented train dataset
         """
         if self.do_aug_train:
             data = data.map(self.process_data, num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
@@ -108,55 +104,12 @@ class Aug(AugmentorBase):
 
         """
         calling the augmentation and map the dataset to the augmentation methods
-        :param data: val dataset, type=tf.dataset
-        :return: augmented val dataset
+        Args:
+            data: val dataset, type=tf.dataset
+        Returns:
+            augmented val dataset
         """
         if self.do_aug_val:
             data.map(partial(self.process_data), num_parallel_calls=AUTOTUNE).prefetch(AUTOTUNE)
 
         return data
-
-
-import os
-import sys
-import yaml
-
-# class Struct:
-#     def __init__(self, **entries):
-#         for k, v in entries.items():
-#             if isinstance(v, dict):
-#                 self.__dict__[k] = Struct(**v)
-#             else:
-#                 self.__dict__[k] = v
-
-# utils_dir = os.path.abspath('../../runs/template/config.yaml')
-# sys.path.append(utils_dir)
-# print(utils_dir)
-#
-# with open(utils_dir) as f:
-#     # use safe_load instead load
-#     data_map = yaml.safe_load(f)
-#
-# config = Struct(**data_map)
-#
-# dataset = EchoNetDataLoader(config)
-# train_gen, n_iter_train = dataset.create_train_data_generator()
-# print(type(train_gen))
-#
-# augmenatation_ = Aug()
-# train_gen = augmenatation_.add_augmentation(train_gen)
-# print(type(train_gen))
-# batch = next(iter(train_gen))
-# for i, ele in zip(range(0, 1), train_gen):
-#     print('index:', i)
-#     print(ele)
-#     print('len(ele):', len(ele))
-#     print('ele[0].numpy().shape:', ele[0].numpy().shape)
-#     first_img = ele[0]
-#     img_label = ele[1]
-#     img_weights = ele[2]
-#     fig, ax = plt.subplots(1, 3)
-#     ax[0].imshow(first_img)
-#     ax[1].imshow(img_label)
-#     ax[2].imshow(img_weights)
-#     plt.show()

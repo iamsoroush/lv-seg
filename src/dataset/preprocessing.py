@@ -11,7 +11,8 @@ class PreprocessorTF(PreprocessorBase):
         Args:
             image: tensor containing single image
 
-        Returns: preprocessed image with type tensor
+        Returns:
+            preprocessed image with type tensor
 
         in this method all preprocessing methods(converting ti gray , resizing , normalization)
         will be done  on input based on config  setting
@@ -66,17 +67,16 @@ class PreprocessorTF(PreprocessorBase):
 
     def _wrapper_image_preprocess(self, x, y, w):
         """
+        this method calls image_preprocess on x and do preprocessing just on x ,
+        y and w will not change here
 
         Args:
             x: a tensor containing single image
             y: a tensor containing single label
             w: a tensor containing single weight
 
-        Returns: pre_processed x ,  y , w
-
-        this method calls image_preprocess on x and do preprocessing just on x ,
-        y and w will not change here
-
+        Returns:
+            pre_processed x ,  y , w
         """
         pre_processed = self.image_preprocess(x)
         return pre_processed, y, w
@@ -104,7 +104,8 @@ class PreprocessorTF(PreprocessorBase):
         Args:
             generator: input dataset ,  type = (tensor dataset)
 
-        Returns: a tensor dataset with preprocessed x (images)
+        Returns:
+            a tensor dataset with preprocessed x (images)
 
         in this method , the map method will be called on our tensor dataset , and only the images will become
         preprocessed
@@ -118,7 +119,8 @@ class PreprocessorTF(PreprocessorBase):
          Args:
              generator: input dataset ,  type = (tensor dataset)
 
-         Returns: a tensor dataset with preprocessed y and preprocessed w (label and weight)
+         Returns:
+             a tensor dataset with preprocessed y and preprocessed w (label and weight)
 
          in this method , the map method will be called on our tensor dataset , and only the label and weight will
          become preprocessed
@@ -148,7 +150,8 @@ class PreprocessorTF(PreprocessorBase):
         Args:
             image: input image , type  =tensor
 
-        Returns: resized image ,  type  =tensor
+        Returns:
+            resized image ,  type  =tensor
 
         resizing image into the target_size dimensions
 
@@ -167,7 +170,8 @@ class PreprocessorTF(PreprocessorBase):
             min_val: minimum value of the image
             max_val: maximum value of the image
 
-        Returns: rescaled image
+        Returns:
+            rescaled image
 
         """
 
@@ -183,7 +187,8 @@ class PreprocessorTF(PreprocessorBase):
         Args:
             image: input image , tensor
 
-        Returns: converted image
+        Returns:
+            converted image
 
         """
         gray_image = tf.image.rgb_to_grayscale(image)
@@ -236,32 +241,3 @@ class PreprocessorTF(PreprocessorBase):
         self.do_normalization = True
         self.min = 0
         self.max = 255
-
-# if __name__ == '__main__':
-#     root_dir = os.path.abspath(os.curdir)
-#     if 'lv-seg' not in root_dir:
-#         root_dir = os.path.join(root_dir, 'lv-seg').replace('\\', '/')
-#     config_path = os.path.join(root_dir, "../../runs/template/config.yaml")
-#     config = load_config_file(config_path)
-#
-#     dataset_obj = EchoNetDataLoader(config)
-#     train_gen, train_n_iter = dataset_obj.create_train_data_generator()
-#     val_gen, val_n_iter = dataset_obj.create_validation_data_generator()
-#     test_gen, test_n_iter = dataset_obj.create_test_data_generator()
-#     print(train_n_iter)
-#
-#     pre_processor = PreprocessorTF()
-#     pre_processed_dataset = pre_processor.add_preprocess(train_gen, train_n_iter)
-#
-#     for i, ele in zip(range(0, 1), pre_processed_dataset):
-#         print(i)
-#         print(len(ele[0]))
-#         print(ele[0].numpy().shape)
-#         first_img = ele[0][0]
-#         img_label = ele[1][0]
-#         img_weights = ele[2][0]
-#         fig, ax = plt.subplots(1, 3)
-#         ax[0].imshow(first_img)
-#         ax[1].imshow(img_label)
-#         ax[2].imshow(img_weights)
-#         plt.show()

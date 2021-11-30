@@ -1,13 +1,11 @@
-from dataset.preprocessing import PreprocessorTF
 import os
 import sys
 import tensorflow as tf
-
+import pytest
+sys.path.append(os.path.abspath('../..'))
+from dataset.preprocessing import PreprocessorTF
 from dataset.data_loader import EchoNetDataLoader
 from utils import load_config_file
-# from echotrain.utils import load_config_file
-import pytest
-import matplotlib.pyplot as plt
 
 
 class TestClass:
@@ -25,8 +23,7 @@ class TestClass:
     @pytest.fixture
     def dataset(self, config):
         data_dir = config.data_loader.dataset_dir
-        dataset_obj = EchoNetDataLoader(data_dir, config)
-        dataset, train_n_iter = dataset_obj.create_training_generator()
+        dataset = EchoNetDataLoader(data_dir, config)
         return dataset
 
     def test_add_image_preprocess(self, dataset, config):

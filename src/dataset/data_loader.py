@@ -24,7 +24,7 @@ class EchoNetDataLoader(DataLoaderBase):
         # for training set:
         train_gen, val_gen, n_iter_train, n_iter_val= dataset.create_data_generators()
 
-        # for test set:
+        # for tests set:
         test_gen = dataset.create_test_data_generator()
 
     Attributes:
@@ -41,7 +41,7 @@ class EchoNetDataLoader(DataLoaderBase):
         _clean_data_df: contains the desired field information with image and labels full pathes
         train_df_: information dataframe of train set, pd.DataFrame
         val_df_: information dataframe of validation set, pd.DataFrame
-        test_df_: information dataframe of test set, pd.DataFrame
+        test_df_: information dataframe of tests set, pd.DataFrame
 
     """
 
@@ -127,8 +127,9 @@ class EchoNetDataLoader(DataLoaderBase):
         """
         Creates tf.data.Dataset for train set based on input_size
 
-        :returns dataset_creator: tf.data.Dataset of train set which returns (h, w, c) tensors
-        :returns test_n: number of data for test set
+        Returns:
+             dataset_creator: tf.data.Dataset of train set which returns (h, w, c) tensors
+             test_n: number of data for tests set
         """
 
         dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.sample_weights)
@@ -141,8 +142,9 @@ class EchoNetDataLoader(DataLoaderBase):
         """
         Creates tf.data.Dataset for validation set based on input_size
 
-        :returns dataset_creator: tf.data.Dataset of validation set which returns (h, w, c) tensors
-        :returns val_n: number of data for test set
+        Returns:
+             dataset_creator: tf.data.Dataset of validation set which returns (h, w, c) tensors
+             val_n: number of data for tests set
         """
 
         dataset_creator = DataSetCreator(self.x_val_dir, self.y_val_dir, self.sample_weights)
@@ -155,8 +157,9 @@ class EchoNetDataLoader(DataLoaderBase):
         """
         Creates tf.data.Dataset based on input_size
 
-        :returns dataset_creator: tf.data.Dataset of test set which returns (h, w, c) tensors
-        :returns test_n: number of data for test set
+        Returns:
+            dataset_creator: tf.data.Dataset of tests set which returns (h, w, c) tensors
+            test_n: number of data for tests set
         """
 
         dataset_creator = DataSetCreator(self.x_test_dir, self.y_test_dir, to_fit=False)
@@ -169,7 +172,7 @@ class EchoNetDataLoader(DataLoaderBase):
 
     @property
     def raw_df(self):
-        """:return pandas.DataFrame of all features of each data in dataset"""
+        """Returns: pandas.DataFrame of all features of each data in dataset"""
 
         return self.df_dataset
 
@@ -196,8 +199,9 @@ class EchoNetDataLoader(DataLoaderBase):
 
         dataset_dir: directory address of the dataset
 
-        :return list_images_dir: list of the desired images view directories
-        :return dict_labels_dir: dictionary of the type_map label paths
+        Returns:
+            list_images_dir: list of the desired images view directories
+            dict_labels_dir: dictionary of the type_map label paths
         """
 
         self._clean_data_df = self.df_dataset[self.df_dataset['view'].isin(self.view) &
@@ -250,7 +254,7 @@ class EchoNetDataLoader(DataLoaderBase):
           lv_edv: Left ventricle end_diastolic volume
           lv_esv: Left ventricle end_systolic volume
           lv_ef: Left ventricle ejection fraction
-          status: showing weather the case is for train, validation or test set
+          status: showing weather the case is for train, validation or tests set
 
           df_dataset: Pandas DataFrame consisting features of each data in dataset
         """
@@ -319,11 +323,13 @@ class EchoNetDataLoader(DataLoaderBase):
         """
         makes a shuffle index array to make a fixed shuffling order for both X, y
 
-        :param x: list of images, np.ndarray
-        :param y: list of segmentation labels, np.ndarray
+        Args:
+            x: list of images, np.ndarray
+            y: list of segmentation labels, np.ndarray
 
-        :return x: shuffled list of images, np.ndarray
-        :return y: shuffled list of segmentation labels, np.ndarray
+        Returns:
+            x: shuffled list of images, np.ndarray
+            y: shuffled list of segmentation labels, np.ndarray
         """
 
         # seed initialization
@@ -341,7 +347,7 @@ class EchoNetDataLoader(DataLoaderBase):
 
     def _split_indexes(self):
         """
-        making splitting indexes for train, validation, test set from the echonet dataframe
+        making splitting indexes for train, validation, tests set from the echonet dataframe
         """
         self.indexes = self._clean_data_df.index
         self.train_indices = self.indexes[self._clean_data_df['status'] == 'TRAIN']
