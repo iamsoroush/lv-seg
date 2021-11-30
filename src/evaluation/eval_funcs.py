@@ -92,7 +92,7 @@ def get_iou_coef(threshold=0.5, smooth=0.001):
         # our input y_pred is softmax prediction so we change it to 0 ,1 classes
         y_pred_thresholded = tf.cast(y_pred > threshold, tf.float32)
 
-        intersection = tf.math.reduce_sum(tf.abs.abs(y_true * y_pred_thresholded))
+        intersection = tf.math.reduce_sum(tf.abs(y_true * y_pred_thresholded))
         union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred_thresholded) - intersection
         iou = (intersection + smooth) / (union + smooth)
         return iou
