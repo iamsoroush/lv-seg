@@ -2,7 +2,7 @@ import os
 import pytest
 from ..data_loader import EchoNetDataLoader
 from ..data_loader import DataSetCreator
-from dataset.aug import Aug
+from dataset.augmentation import Augmentor
 from utils import load_config_file
 
 
@@ -43,7 +43,7 @@ class TestClass:
 
     @pytest.fixture
     def augmentor(self, config):
-        augmentor = Aug(config)
+        augmentor = Augmentor(config)
         return augmentor
 
     # def test_batch_augmentation(self, augmentor, data_gen):

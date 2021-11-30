@@ -7,7 +7,7 @@ from albumentations import (
     Compose)
 
 
-class Aug(AugmentorBase):
+class Augmentor(AugmentorBase):
     """
     this class aims to implement augmentation on train and validation data
 
