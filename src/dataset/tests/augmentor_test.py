@@ -1,9 +1,9 @@
 import os
-from dataset.augmentor import Augmentor
+from ..augmentor import Augmentor
 import pytest
-from dataset.dataset import DataLoader
-from dataset.dataset_generator import DatasetGenerator
-from utils import *
+from ..dataset import DataLoader
+from ..dataset_generator import DatasetGenerator
+from abstractions.utils import load_config_file
 
 
 class TestClass:

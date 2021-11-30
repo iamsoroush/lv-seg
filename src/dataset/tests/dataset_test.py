@@ -1,7 +1,7 @@
 import os
 import pytest
-from dataset.dataset import DataLoader
-from utils import *
+from ..dataset import DataLoader
+from abstractions.utils import load_config_file
 
 
 class TestClass:

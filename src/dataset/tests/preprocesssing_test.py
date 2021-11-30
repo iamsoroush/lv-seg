@@ -1,9 +1,9 @@
-from dataset.preprocessing import Preprocessor
+from ..preprocessing import Preprocessor
 import os
-from dataset.dataset_generator import DatasetGenerator
+from ..dataset_generator import DatasetGenerator
 import pytest
-from dataset.dataset import DataLoader
-from utils import *
+from ..dataset import DataLoader
+from abstractions.utils import load_config_file
 
 
 class TestClass:
@@ -119,13 +119,3 @@ class TestClass:
         print(len(next(pre_processed_image[0])))
         assert 'int' in str(type(n_data_points))
         assert len(next(pre_processed_image[0])) == 3
-
-
-
-
-
-
-
-
-
-
