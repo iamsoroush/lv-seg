@@ -1,10 +1,10 @@
 import os
-from dataset.augmentor import Augmentor
+from .augmentor import Augmentor
 import pytest
-from dataset.dataset import DataLoader
-from dataset.dataset_generator import DatasetGenerator
+from .dataset import DataLoader
+from .dataset_generator import DatasetGenerator
 from utils import *
-
+import types
 
 class TestClass:
 
@@ -58,4 +58,5 @@ class TestClass:
 
         # Type checking
         assert 'float' in str(augmented_batch[0][0].dtype)
-        assert 'generator' in str(type(augmented_gen))
+        #assert 'generator' in str(type(augmented_gen))
+        assert isinstance(augmented_gen, types.GeneratorType)

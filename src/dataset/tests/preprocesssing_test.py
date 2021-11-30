@@ -1,9 +1,10 @@
-from dataset.preprocessing import Preprocessor
+from .preprocessing import Preprocessor
 import os
-from dataset.dataset_generator import DatasetGenerator
+from .dataset_generator import DatasetGenerator
 import pytest
-from dataset.dataset import DataLoader
+from .dataset import DataLoader
 from utils import *
+import types
 
 
 class TestClass:
@@ -85,7 +86,8 @@ class TestClass:
 
         # Type checking
         assert 'float' in str(next(pre_processed_batch)[0].dtype)
-        assert 'generator' in str(type(pre_processed_batch))
+        # assert 'generator' in str(type(pre_processed_batch))
+        assert isinstance(pre_processed_batch, types.GeneratorType)
 
     def test_add_label_preprocess(self, pre_processor, data_gen):
         pre_processed_batch = pre_processor.add_label_preprocess(data_gen)
@@ -96,36 +98,26 @@ class TestClass:
 
         # Type checking
         assert 'float' in str(next(pre_processed_batch)[1].dtype)
-        assert 'generator' in str(type(pre_processed_batch))
+        # assert 'generator' in str(type(pre_processed_batch))
+        assert isinstance(pre_processed_batch, types.GeneratorType)
 
     def test_batchify(self, pre_processor, data_gen, dataset):
-
         train_gen, n_train = dataset.create_training_generator()
         n_data_points = n_train
         image_batchify = pre_processor.batchify(data_gen, n_data_points)
         assert 'int' in str(type(image_batchify[1]))
-        assert 'generator' in str(type(image_batchify[0]))
-        print(len(next(image_batchify[0])))
+        # assert 'generator' in str(type(image_batchify[0]))
+        assert isinstance(image_batchify[0], types.GeneratorType)
         assert 'int' in str(type(n_data_points))
         assert len(next(image_batchify[0])) == 3
 
     def test_add_preprocess(self, pre_processor, data_gen, dataset):
-
         train_gen, n_train = dataset.create_training_generator()
         n_data_points = n_train
         pre_processed_image = pre_processor.add_preprocess(data_gen, n_data_points)
         assert 'int' in str(type(pre_processed_image[1]))
-        assert 'generator' in str(type(pre_processed_image[0]))
+        # assert 'generator' in str(type(pre_processed_image[0]))
+        assert isinstance(pre_processed_image[0], types.GeneratorType)
         print(len(next(pre_processed_image[0])))
         assert 'int' in str(type(n_data_points))
         assert len(next(pre_processed_image[0])) == 3
-
-
-
-
-
-
-
-
-
-
