@@ -33,7 +33,7 @@ class TestClass:
     def test_create_training_generator(self, dataset):
         train_gen, n_train = dataset.create_training_generator()
 
-        assert n_train == len(dataset.x_train_dir) / dataset.batch_size
+        assert n_train == len(dataset.x_train_dir)
         # assert 'generator' in str(type(train_gen))
         assert isinstance(train_gen, types.GeneratorType)
         assert len(next(train_gen)) == 3
@@ -44,7 +44,7 @@ class TestClass:
     def test_create_validation_generator(self, dataset):
         val_gen, val_n = dataset.create_validation_generator()
 
-        assert val_n == len(dataset.x_val_dir) / dataset.batch_size
+        assert val_n == len(dataset.x_val_dir)
         # assert 'generator' in str(type(val_gen))
         assert isinstance(val_gen, types.GeneratorType)
         assert len(next(val_gen)) == 3
@@ -55,7 +55,7 @@ class TestClass:
     def test_create_test_generator(self, dataset):
         test_gen, test_n = dataset.create_test_generator()
 
-        assert test_n == len(dataset.x_test_dir) / dataset.batch_size
+        assert test_n == len(dataset.x_test_dir)
         # assert 'generator' in str(type(test_gen))
         assert isinstance(test_gen, types.GeneratorType)
         assert len(next(test_gen)) == 3

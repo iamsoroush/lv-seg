@@ -79,7 +79,6 @@ class TestClass:
 
     def test_add_image_preprocess(self, pre_processor, data_gen):
         pre_processed_batch = pre_processor.add_image_preprocess(data_gen)
-        print(type(pre_processed_batch))
 
         # Size checking
         assert next(pre_processed_batch)[0].shape == (128, 128, 1)
@@ -91,7 +90,6 @@ class TestClass:
 
     def test_add_label_preprocess(self, pre_processor, data_gen):
         pre_processed_batch = pre_processor.add_label_preprocess(data_gen)
-        print(type(pre_processed_batch))
 
         # Size checking
         assert next(pre_processed_batch)[1].shape == (128, 128, 1)
@@ -118,6 +116,5 @@ class TestClass:
         assert 'int' in str(type(pre_processed_image[1]))
         # assert 'generator' in str(type(pre_processed_image[0]))
         assert isinstance(pre_processed_image[0], types.GeneratorType)
-        print(len(next(pre_processed_image[0])))
         assert 'int' in str(type(n_data_points))
         assert len(next(pre_processed_image[0])) == 3
