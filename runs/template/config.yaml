@@ -22,6 +22,15 @@ batch_size: 8
 # Parameters for instantiating DataLoader
 data_loader:
   shuffle: True # on training data
+  split_ratio: 0.9
+  to_fit: True
+  dataset_features:
+    age: [ 18, 100 ]
+    sex: [ "M", "F" ]
+    stage: [ "ES", "ED" ]
+    image_quality: [ "Poor", "Medium", "Good" ]
+    view: [ "4CH" ]
+
 
 # Parameters for model-builder
 model_builder:
@@ -33,6 +42,12 @@ model_builder:
 # Parameters for instantiating Preprocessor
 preprocessor:
   normalization_type: null
+  format: "gray_scale"
+  max: 255
+  min: 0
+  do_resizing: True
+  do_normalization: True
+
 
 # Parameters for instantiating augmentation
 do_train_augmentation: True

@@ -1,0 +1,219 @@
+from abstractions import PreprocessorBase
+import tensorflow as tf
+import numpy as np
+from skimage.color import rgb2gray
+
+
+class Preprocessor(PreprocessorBase):
+    """
+     PreProcess module used for images, batches, generators
+
+    Example::
+
+        preprocessor = PreProcess()
+        image = preprocessor.img_preprocess(image)
+        X, y = preprocessor.batch_preprocess(gen_batch)
+        data_gen = preprocessor.add_preprocess(data_gen, add_augmentation=True)
+
+    Attributes:
+
+        target_size: image target size for resizing, tuple (image_height, image_width)
+        min: minimum value of the image range, int
+        max: maximum value of the image range, int
+        normalization: for rescaling the image, bool
+
+    """
+
+    def __init__(self, config):
+
+        """
+        """
+        super().__init__(config)
+        self._load_params(config)
+        self.batch_size = config.batch_size
+
+    def image_preprocess(self, image):
+
+        """
+        pre-processing on input image
+
+        :param image: input image, np.array
+        :param inference: resize if the user is in inference phase
+
+        :return: pre_processed_img
+        """
+
+        pre_processed_img = image.copy()
+
+        # converting the images to grayscale
+        if len(image.shape) != 2 and image.shape[-1] != 1:
+            pre_processed_img = self._convert_to_gray(pre_processed_img)
+
+        # resizing
+        if self.do_resizing:
+            pre_processed_img = self._resize(pre_processed_img)
+
+        # normalization on the given image
+        if self.do_normalization:
+            pre_processed_img = self._rescale(pre_processed_img, self.min, self.max)
+
+        return pre_processed_img
+
+    def label_preprocess(self, label):
+
+        """
+        pre-processing on input label
+
+        :param label: input label, np.array
+
+        :return: pre-processed label
+        """
+
+        if self.do_resizing:
+            label = self._resize(label[:, :, tf.newaxis])
+
+        return label
+
+    def batch_preprocess(self, batch):
+
+        """
+        batch pre_processing function
+
+        :param batch: input batch (X, y)
+
+        :return: x_preprocessed_batch: preprocessed batch for x
+        :return: y_preprocessed_batch: preprocessed batch for y
+        """
+
+        # images of the give batch
+        x = batch[0]
+
+        # labels of the give batch
+        y = batch[1]
+
+        # pre-processing every image of the batch given
+        x_preprocessed_batch = np.array(list(self.image_preprocess(x)))
+        # the labels of the batches do not need pre-processing (yet!)
+        y_preprocessed_batch = np.array(list(self.label_preprocess(y)))
+
+        return x_preprocessed_batch, y_preprocessed_batch
+
+    def add_image_preprocess(self, generator):
+
+        while True:
+            batch = next(generator)
+            label = batch[1]
+            third_element = batch[2]
+            pre_processed_batch = self.batch_preprocess(batch)
+            pre_processed_batch = (pre_processed_batch[0], label, third_element)
+            yield pre_processed_batch
+
+    def add_label_preprocess(self, generator):
+
+        while True:
+            batch = next(generator)
+            image = batch[0]
+            third_element = batch[2]
+            pre_processed_batch = self.batch_preprocess(batch)
+            pre_processed_batch = (image, pre_processed_batch[1], third_element)
+            yield pre_processed_batch
+
+    def batchify(self, generator, n_data_points):
+        n_iter = n_data_points // self.batch_size + int((n_data_points % self.batch_size) > 0)
+        gen = self._batch_gen(generator, self.batch_size)
+        return gen, n_iter
+
+    @staticmethod
+    def _batch_gen(generator, batch_size):
+        while True:
+            x_b, y_b, z_b = list(), list(), list()
+            for i in range(batch_size):
+                x, y, z = next(generator)
+                x_b.append(x)
+                y_b.append(y)
+                z_b.append(z)
+            yield np.array(x_b), np.array(y_b), np.array(z_b)
+
+    def add_preprocess(self, generator, n_data_points):
+
+        """providing the suggested pre-processing for the given generator
+
+        :param generator: input generator ready for pre-processing, data generator < class DataGenerator >
+        :param add_augmentation: pass True if your generator is train_gen
+
+        :return: preprocessed_gen: preprocessed generator, data generator < class DataGenerator >
+        """
+
+        generator = self.add_image_preprocess(generator)
+        generator = self.add_label_preprocess(generator)
+        generator, n_iter = self.batchify(generator, n_data_points)
+
+        return generator, n_iter
+
+    def _load_params(self, config):
+
+        self.input_h = config.input_height
+        self.input_w = config.input_width
+        self.max = config.preprocessor.max
+        self.min = config.preprocessor.min
+        self.do_resizing = config.preprocessor.do_resizing
+        self.do_normalization = config.preprocessor.do_normalization
+
+    def _set_defaults(self):
+        self.input_h = 256
+        self.input_w = 256
+        self.max = 255
+        self.min = 0
+        self.do_resizing = True
+        self.do_normalization = True
+
+    @property
+    def target_size(self):
+        return self.input_h, self.input_w
+
+    def _resize(self, image):
+
+        """
+        resizing image into the target_size dimensions
+
+        :param image: input image, np.array
+
+        :return: resized image
+        """
+
+        image_resized = np.array(tf.image.resize(image,
+                                                 self.target_size,
+                                                 antialias=False,
+                                                 method=tf.image.ResizeMethod.NEAREST_NEIGHBOR))
+        return image_resized
+
+    @staticmethod
+    def _rescale(image, min_val, max_val):
+
+        """
+        rescaling the input image
+
+        :param image: input image, np.array
+        :param min_val: minimum value of the image
+        :param max_val: maximum value of the image
+
+        :return: rescaled image
+        """
+
+        rescaled_image = (image - min_val) / (max_val - min_val)
+
+        return rescaled_image
+
+    @staticmethod
+    def _convert_to_gray(image):
+
+        """
+        converting the input image to grayscale, if needed
+
+        :param image: input image, np array
+
+        :return: converted image
+        """
+
+        gray_image = rgb2gray(image)
+        return gray_image
