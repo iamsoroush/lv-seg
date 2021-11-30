@@ -91,7 +91,7 @@ class DatasetGenerator(tf.keras.utils.Sequence):
         if not self.is_test:
           third_element = np.array([1])
         elif self.is_test:
-          third_element = int(self.test_indices[indexes].values)
+          third_element = np.array([int(self.test_indices[indexes].values)])
         # returning the data using the selected indexes
         if self.to_fit:
             y = self.generate_y(batch_image_dir)
