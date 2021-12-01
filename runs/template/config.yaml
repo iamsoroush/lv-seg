@@ -4,7 +4,9 @@ input_height: 128 # For resizing and model creation
 input_width: 128 # For resizing and model creation
 # n_channels must be set in code based on dataset and task
 
-src_code_path: 'src' # put '' if packages are in root directory of your repository
+src_code_path: 'src'
+
+data_dir: '/home/vafaeisa/scratch/datasets/echonet'
 
 # Classes
 data_loader_class: dataset.DataLoader # Required
