@@ -3,7 +3,7 @@ from ..augmentor import Augmentor
 import pytest
 from ..dataset import DataLoader
 from ..dataset_generator import DatasetGenerator
-from utils import *
+from ...utils import *
 import types
 
 

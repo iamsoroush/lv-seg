@@ -3,7 +3,7 @@ import os
 from ..dataset_generator import DatasetGenerator
 import pytest
 from ..dataset import DataLoader
-from utils import *
+from ...utils import *
 import types
 
 
