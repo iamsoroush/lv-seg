@@ -1,7 +1,7 @@
 import os
 import pytest
 from ..dataset import DataLoader
-from utils import *
+from ...utils import *
 import types
 
 
@@ -34,8 +34,6 @@ class TestClass:
         train_gen, n_train = dataset.create_training_generator()
 
         assert n_train == len(dataset.x_train_dir)
-        # assert 'generator' in str(type(train_gen))
-        assert isinstance(train_gen, types.GeneratorType)
         assert len(next(train_gen)) == 3
         assert next(train_gen)[0].shape
         assert next(train_gen)[1].shape
@@ -45,8 +43,6 @@ class TestClass:
         val_gen, val_n = dataset.create_validation_generator()
 
         assert val_n == len(dataset.x_val_dir)
-        # assert 'generator' in str(type(val_gen))
-        assert isinstance(val_gen, types.GeneratorType)
         assert len(next(val_gen)) == 3
         assert next(val_gen)[0].shape
         assert next(val_gen)[1].shape
@@ -56,8 +52,6 @@ class TestClass:
         test_gen, test_n = dataset.create_test_generator()
 
         assert test_n == len(dataset.x_test_dir)
-        # assert 'generator' in str(type(test_gen))
-        assert isinstance(test_gen, types.GeneratorType)
         assert len(next(test_gen)) == 3
         assert next(test_gen)[0].shape
         assert next(test_gen)[1].shape
