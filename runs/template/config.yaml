@@ -5,12 +5,13 @@ input_width: 128 # For resizing and model creation
 # n_channels must be set in code based on dataset and task
 
 src_code_path: 'src' # put '' if packages are in root directory of your repository
+data_dir: 'assets/EchoNet-Dynamic'
 
 # Classes
 data_loader_class: dataset.DataLoader # Required
-model_builder_class: models.ModelBuilder # Required
-preprocessor_class: preprocessing.Preprocessror # Required
-augmentor_class: augmentation.Augmentor
+model_builder_class: model.ModelBuilder # Required
+preprocessor_class: dataset.Preprocessror # Required
+augmentor_class: dataset.Augmentor
 evaluator_class: evaluation.Evaluator
 
 # Epochs

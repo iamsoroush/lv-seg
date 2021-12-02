@@ -24,12 +24,6 @@ class Preprocessor(PreprocessorBase):
 
     """
 
-    def __init__(self, config):
-
-        super().__init__(config)
-        self._load_params(config)
-        self.batch_size = config.batch_size
-
     def image_preprocess(self, image):
 
         """
@@ -241,6 +235,7 @@ class Preprocessor(PreprocessorBase):
         self.min = config.preprocessor.min
         self.do_resizing = config.preprocessor.do_resizing
         self.do_normalization = config.preprocessor.do_normalization
+        self.batch_size = config.batch_size
 
     def _set_defaults(self):
 
@@ -249,12 +244,13 @@ class Preprocessor(PreprocessorBase):
         Returns:
 
         """
-        self.input_h = 256
-        self.input_w = 256
+        self.input_h = 128
+        self.input_w = 128
         self.max = 255
         self.min = 0
         self.do_resizing = True
         self.do_normalization = True
+        self.batch_size = 8
 
     @property
     def target_size(self):
