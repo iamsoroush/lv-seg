@@ -18,6 +18,7 @@ def test_requirements():
         "albumentations",
         "tqdm",
         "pytest",
+        "pytest-dependency"
     ]
 
     project_dir = pathlib.Path(__file__).parent.parent

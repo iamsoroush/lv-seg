@@ -11,3 +11,5 @@ pyyaml
 albumentations
 tqdm
 pytest
+pytest-dependency
+pre-commit
