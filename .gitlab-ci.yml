@@ -27,10 +27,10 @@ test:
     - pip install pytest-dependency
 #    - pip install flake8  # you can also use tox
     - cd ${CI_PROJECT_DIR}
-    - pytest tests -m init --disable-pytest-warnings --run_name migration_python_gen
-    - for config in  $(find runs -type f -name *.yaml)
+    - pytest tests -m init
+    - for config_path in  $(find runs -type f -name *.yaml)
         do
-          pytest tests -v -m component --run_name "$config"
+          pytest tests -v -m component --config_path "$config_path"
         done
 
 #    - tox -e py36,flake8

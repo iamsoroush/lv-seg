@@ -499,18 +499,27 @@ class TestTraining:
         model = component_holder['compiled_model']
         train_gen = component_holder['train_data_gen']
         val_gen = component_holder['validation_data_gen']
-        train_iter = 3  # component_holder['n_iter_train']
-        val_iter = 3  # component_holder['n_iter_validation']
+
+        x_tr, y_tr, w_tr = next(iter(train_gen))
+        x_val, y_val, w_val = next(iter(val_gen))
+
+        initial_tr_loss = model.evaluate(x_tr, y_tr, sample_weight=w_tr, return_dict=True)['loss']
+        initial_val_loss = model.evaluate(x_val, y_val, sample_weight=w_val, return_dict=True)['loss']
+        # train_iter = 3  # component_holder['n_iter_train']
+        # val_iter = 3  # component_holder['n_iter_validation']
+
         epochs = 3
 
-        history = model.fit(train_gen,
-                            steps_per_epoch=train_iter,
+        history = model.fit(x_tr,
+                            y_tr,
                             epochs=epochs,
-                            validation_data=val_gen,
-                            validation_steps=val_iter)
+                            sample_weight=w_tr,
+                            validation_data=(x_val, y_val, w_val))
         assert True
 
         component_holder['training_history'] = history.history
+        component_holder['initial_training_loss'] = initial_tr_loss
+        component_holder['initial_validation_loss'] = initial_val_loss
 
     @pytest.mark.dependency(depends=['TestTraining::test_model_training'])
     def test_model_loss_is_decreasing(self, component_holder):

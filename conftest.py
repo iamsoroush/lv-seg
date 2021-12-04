@@ -1,15 +1,13 @@
+import pytest
+
 import sys
 sys.path.append('src')
-
-import pytest
-from pathlib import Path
-from abstractions.utils import load_config_file
 
 
 def pytest_configure(config):
     """Add custom markers."""
 
-    config.addinivalue_line('markers', 'faketest: faketests for testing testing!')
+    config.addinivalue_line('markers', 'faketest: faketests for tests tests!')
     config.addinivalue_line('markers', 'component: add this to test your components')
     config.addinivalue_line('markers', 'init: add this to tests that need to run before component tests.')
 

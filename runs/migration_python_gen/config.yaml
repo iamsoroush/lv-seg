@@ -64,6 +64,3 @@ augmentor:
 export:
   metric: "val_loss"
   mode: "min"
-
-# MLFlow
-project_name: 'echo-lv-seg' # will be used as mlflow's experiment_name
