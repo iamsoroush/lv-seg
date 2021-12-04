@@ -58,4 +58,4 @@ class TestClass:
 
         # Type checking
         assert 'float' in str(augmented_batch[0][0].dtype)
-        assert 'generator' in str(type(augmented_gen))
+
