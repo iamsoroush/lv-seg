@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument('--data_dir',
                         type=str,
                         help='absolute path to directory of the dataset',
-                        required=True)
+                        required=False)
 
     return parser.parse_args()
 
@@ -24,7 +24,9 @@ def parse_args():
 def train():
     args = parse_args()
 
-    data_dir = Path(args.data_dir)
+    data_dir = args.data_dir
+    if data_dir is not None:
+        data_dir = Path(data_dir)
     run_name = str(args.run_name)
     # project_root = Path(args.project_root)
     project_root = Path(__file__).parent.parent
