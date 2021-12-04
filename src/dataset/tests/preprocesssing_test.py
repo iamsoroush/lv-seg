@@ -49,9 +49,6 @@ class TestClass:
 
     def test_image_preprocess(self, pre_processor, data_gen):
         img = next(data_gen)[0]
-        # print(type(img))
-        # print(len(img))
-        # print(img.shape)
         pre_processed_img = pre_processor.image_preprocess(img)
 
         assert 'numpy.ndarray' in str(type(img))
@@ -78,44 +75,34 @@ class TestClass:
 
     def test_add_image_preprocess(self, pre_processor, data_gen):
         pre_processed_batch = pre_processor.add_image_preprocess(data_gen)
-        print(type(pre_processed_batch))
 
         # Size checking
         assert next(pre_processed_batch)[0].shape == (128, 128, 1)
 
         # Type checking
         assert 'float' in str(next(pre_processed_batch)[0].dtype)
-        assert 'generator' in str(type(pre_processed_batch))
 
     def test_add_label_preprocess(self, pre_processor, data_gen):
         pre_processed_batch = pre_processor.add_label_preprocess(data_gen)
-        print(type(pre_processed_batch))
 
         # Size checking
         assert next(pre_processed_batch)[1].shape == (128, 128, 1)
 
         # Type checking
         assert 'float' in str(next(pre_processed_batch)[1].dtype)
-        assert 'generator' in str(type(pre_processed_batch))
 
     def test_batchify(self, pre_processor, data_gen, dataset):
-
         train_gen, n_train = dataset.create_training_generator()
         n_data_points = n_train
         image_batchify = pre_processor.batchify(data_gen, n_data_points)
         assert 'int' in str(type(image_batchify[1]))
-        assert 'generator' in str(type(image_batchify[0]))
-        print(len(next(image_batchify[0])))
         assert 'int' in str(type(n_data_points))
         assert len(next(image_batchify[0])) == 3
 
     def test_add_preprocess(self, pre_processor, data_gen, dataset):
-
         train_gen, n_train = dataset.create_training_generator()
         n_data_points = n_train
         pre_processed_image = pre_processor.add_preprocess(data_gen, n_data_points)
         assert 'int' in str(type(pre_processed_image[1]))
-        assert 'generator' in str(type(pre_processed_image[0]))
-        print(len(next(pre_processed_image[0])))
         assert 'int' in str(type(n_data_points))
         assert len(next(pre_processed_image[0])) == 3

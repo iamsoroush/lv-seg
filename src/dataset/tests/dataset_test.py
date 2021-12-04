@@ -32,30 +32,26 @@ class TestClass:
     def test_create_training_generator(self, dataset):
         train_gen, n_train = dataset.create_training_generator()
 
-        assert n_train == len(dataset.x_train_dir) / dataset.batch_size
-        assert 'generator' in str(type(train_gen))
+        assert n_train == len(dataset.x_train_dir)
         assert len(next(train_gen)) == 3
         assert next(train_gen)[0].shape
         assert next(train_gen)[1].shape
-        print(type(next(train_gen)[2]))
-        assert 'int' in str(type(next(train_gen)[2]))
+        assert 'numpy' in str(type(next(train_gen)[2]))
 
     def test_create_validation_generator(self, dataset):
         val_gen, val_n = dataset.create_validation_generator()
 
-        assert val_n == len(dataset.x_val_dir) / dataset.batch_size
-        assert 'generator' in str(type(val_gen))
+        assert val_n == len(dataset.x_val_dir)
         assert len(next(val_gen)) == 3
         assert next(val_gen)[0].shape
         assert next(val_gen)[1].shape
-        assert 'int' in str(type(next(val_gen)[2]))
+        assert 'numpy' in str(type(next(val_gen)[2]))
 
     def test_create_test_generator(self, dataset):
         test_gen, test_n = dataset.create_test_generator()
 
-        assert test_n == len(dataset.x_test_dir) / dataset.batch_size
-        assert 'generator' in str(type(test_gen))
+        assert test_n == len(dataset.x_test_dir)
         assert len(next(test_gen)) == 3
         assert next(test_gen)[0].shape
         assert next(test_gen)[1].shape
-        assert 'int' in str(type(next(test_gen)[2]))
+        assert 'numpy' in str(type(next(test_gen)[2]))
