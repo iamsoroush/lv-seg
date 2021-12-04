@@ -92,7 +92,7 @@ class Augmentor(AugmentorBase):
 
     def _load_params(self, config):
 
-        aug_config = config.augmentator
+        aug_config = config.augmentor
         self.rotation_range = aug_config.rotation_range
         self.rotation_proba = aug_config.rotation_proba
         self.flip_proba = aug_config.flip_proba

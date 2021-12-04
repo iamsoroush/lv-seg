@@ -3,8 +3,7 @@ from ..augmentor import Augmentor
 import pytest
 from ..dataset import DataLoader
 from ..dataset_generator import DatasetGenerator
-from ...utils import *
-import types
+from abstractions.utils import load_config_file
 
 
 class TestClass:

@@ -5,12 +5,13 @@ input_width: 128 # For resizing and model creation
 # n_channels must be set in code based on dataset and task
 
 src_code_path: 'src' # put '' if packages are in root directory of your repository
+data_dir: 'assets/EchoNet-Dynamic'
 
 # Classes
 data_loader_class: dataset.DataLoader # Required
-model_builder_class: models.ModelBuilder # Required
-preprocessor_class: preprocessing.Preprocessror # Required
-augmentor_class: augmentation.Augmentor
+model_builder_class: model.UNetBaselineBuilder # Required
+preprocessor_class: dataset.Preprocessor # Required
+augmentor_class: dataset.Augmentor
 evaluator_class: evaluation.Evaluator
 
 # Epochs
@@ -54,7 +55,7 @@ preprocessor:
 # Parameters for instantiating augmentation
 do_train_augmentation: True
 do_validation_augmentation: False
-augmentator:
+augmentor:
   rotation_proba: 0.5
   rotation_range: 45
   flip_proba: 0.5
