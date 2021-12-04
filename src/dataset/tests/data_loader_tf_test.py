@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append(os.path.abspath('../..'))
-from dataset.data_loader import EchoNetDataLoader
+from dataset.data_loader_tf import EchoNetDataLoader
 from utils import load_config_file
 import pytest
 

@@ -1,8 +1,8 @@
 import os
 import pytest
-from ..data_loader import EchoNetDataLoader
-from ..data_loader import DataSetCreator
-from dataset.augmentation import Augmentor
+from ..data_loader_tf import EchoNetDataLoader
+from ..data_loader_tf import DataSetCreator
+from dataset.augmentation_tf import Augmentor
 from utils import load_config_file
 
 

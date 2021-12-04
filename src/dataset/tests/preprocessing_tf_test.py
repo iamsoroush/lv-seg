@@ -3,8 +3,8 @@ import sys
 import tensorflow as tf
 import pytest
 sys.path.append(os.path.abspath('../..'))
-from dataset.preprocessing import PreprocessorTF
-from dataset.data_loader import EchoNetDataLoader
+from dataset.preprocessing_tf import PreprocessorTF
+from dataset.data_loader_tf import EchoNetDataLoader
 from utils import load_config_file
 
 
