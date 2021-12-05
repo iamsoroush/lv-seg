@@ -29,13 +29,13 @@ def train():
         data_dir = Path(data_dir)
     run_name = str(args.run_name)
     # project_root = Path(args.project_root)
-    project_root = Path(__file__).parent.parent
+    project_root = Path(__file__).absolute().parent.parent
 
     mlflow_tracking_uri = os.getenv('MLFLOW_TRACKING_URI')
     if mlflow_tracking_uri is None:
         mlflow_tracking_uri = MLFLOW_TRACKING_URI
     else:
-        mlflow_tracking_uri = Path(mlflow_tracking_uri)
+        mlflow_tracking_uri = str(mlflow_tracking_uri)
 
     eval_reports_dir = os.getenv('EVAL_REPORTS_DIR')
     if eval_reports_dir is None:

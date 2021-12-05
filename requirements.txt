@@ -1,14 +1,14 @@
-tensorflow>=2.7.0
 pandas
 scikit-learn
 scikit-image
 scipy
 matplotlib
+pyyaml
+tqdm
+tensorflow>=2.7.0
 mlflow
 abstractions-aimedic
 SimpleITK
-pyyaml
 albumentations
-tqdm
 pytest
 pytest-dependency
