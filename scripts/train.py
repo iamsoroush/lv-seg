@@ -1,8 +1,7 @@
 import argparse
-from pathlib import Path
 import os
+from pathlib import Path
 from abstractions import Orchestrator
-from abstractions.orchestration import MLFLOW_TRACKING_URI, EVAL_REPORTS_DIR
 
 
 def parse_args():
@@ -21,7 +20,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def train():
+def main():
     args = parse_args()
 
     data_dir = args.data_dir
@@ -33,13 +32,13 @@ def train():
 
     mlflow_tracking_uri = os.getenv('MLFLOW_TRACKING_URI')
     if mlflow_tracking_uri is None:
-        mlflow_tracking_uri = MLFLOW_TRACKING_URI
+        raise Exception('set MLFLOW_TRACKING_URI as an environmental variable.')
     else:
         mlflow_tracking_uri = str(mlflow_tracking_uri)
 
     eval_reports_dir = os.getenv('EVAL_REPORTS_DIR')
     if eval_reports_dir is None:
-        eval_reports_dir = EVAL_REPORTS_DIR
+        raise Exception('set EVAL_REPORTS_DIR as an environmental variable.')
     else:
         eval_reports_dir = Path(eval_reports_dir)
 
@@ -52,4 +51,4 @@ def train():
 
 
 if __name__ == '__main__':
-    train()
+    main()
