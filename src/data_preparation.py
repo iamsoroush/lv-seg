@@ -5,17 +5,17 @@ import pandas as pd
 import skimage.draw
 import skimage.color
 import pydicom as dicom
+from pydicom.datadict import add_dict_entry
 
 
 class ExtractDicom:
-
     """
 
     This class contains implementations of some tools for converting data with DICOM format to AVI
 
     """
 
-    def __init__(self, src_base, dst_base):
+    def __init__(self, src_base, dst_base, features):
         """
 
         Initialize the required variables
@@ -23,11 +23,47 @@ class ExtractDicom:
         Args:
             src_base: Path of the folder which contains DICOM files
             dst_base: Path of the folder that converted AVI videos will be saved in it
+            features: List of features stored in DICOM file
         """
 
         self.src_base_addr = src_base
         self.dst_base_addr = dst_base
         self.df_volume = pd.read_csv(os.path.join(src_base, 'VolumeTracings.csv'))
+        # self.features = ['FileName',
+        #                  'EF',
+        #                  'ESV',
+        #                  'EDV',
+        #                  'FrameHeight',
+        #                  'FrameWidth',
+        #                  'FPS',
+        #                  'NumberOfFrames',
+        #                  'Split']
+        self.features = features
+        if not os.path.isdir(self.dst_base_addr):
+            os.makedirs(self.dst_base_addr)
+
+    def register_data_features(self):
+
+        """
+
+        In this method, the address (tag) assigned for each feature of data frame
+
+        """
+
+        i = 0
+        # self.echo_data_info = {}
+        for k in self.features:
+            print(k)
+            v = 0x10021001 + i
+            char_hex = hex(v)
+            # self.echo_data_info[k] = [int('0x' + char_hex[2:6], 16), int('0x' + char_hex[6:], 16)]
+            if k in ['FileName', 'Split']:
+                add_dict_entry(v, "CS", k, k)
+            else:
+                if k == 'NumberOfFrames':
+                    k = 'NOF'
+                add_dict_entry(v, "DS", k, k)
+            i += 1
 
     def convert_dicom_to_avi(self, src_addr, dst_file_name, csv_addr):
 
@@ -91,8 +127,9 @@ class ExtractDicom:
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         sub_folder = f'{ds.Split.lower()}/Videos'
         sub_folder_path = os.path.join(sub_folder, dst_file_name)
-        if not os.path.isdir(os.path.join(sub_folder)):
-            os.makedirs(sub_folder)
+        if not os.path.isdir(os.path.join(self.dst_base_addr, sub_folder)):
+            os.makedirs(os.path.join(self.dst_base_addr, sub_folder))
+
         dst_path = os.path.join(self.dst_base_addr, sub_folder_path)
         video = cv2.VideoWriter(dst_path, fourcc, 1, (width, height))
 
@@ -113,14 +150,12 @@ class ExtractDicom:
 
         """
 
+        self.register_data_features()
         src = os.path.join(self.src_base_addr, 'Videos')
         files = os.listdir(src)
         csv_addr = os.path.join(self.dst_base_addr, 'FileList.csv')
         for f in files:
             src_path = os.path.join(src, f)
-            dst_video_path = os.path.join(self.dst_base_addr, 'Videos')
-            if not os.path.isdir(dst_video_path):
-                os.makedirs(dst_video_path)
 
             # dst_addr = os.path.join(dst_video_path, f.replace('dcm', 'avi'))
             dst_file_name = f.replace('dcm', 'avi')
@@ -130,24 +165,6 @@ class ExtractDicom:
         df[df['Split'] == 'TRAIN'].to_csv(f'{self.dst_base_addr}/train_features.csv')
         df[df['Split'] == 'TEST'].to_csv(f'{self.dst_base_addr}/test_features.csv')
         df[df['Split'] == 'VAL'].to_csv(f'{self.dst_base_addr}/val_features.csv')
-
-        for subset in ['test', 'train', 'val']:
-            df = pd.read_csv(f'/content/drive/MyDrive/a4c-video-dir/Dataset/{subset}_features.csv')
-            df['ed_frame_class_ratio'] = None
-            df['es_frame_class_ratio'] = None
-            for i in range(len(df)):
-                if df.at[i, 'ED_Frame'] is None:
-                    break
-                else:
-                    for ed_es in ['ed', 'es']:
-                        data = df.at[i, 'FileName']
-                        label = cv2.imread(
-                            f'{self.dst_base_addr}/{subset}/seg_image/{data}_label_{ed_es}.jpg')
-                        label = skimage.color.rgb2gray(label) > 0.5
-                        label = label.astype(int)
-                        n_of_non_zero = cv2.countNonZero(label)
-                        df.at[i, f'{ed_es}_frame_class_ratio'] = n_of_non_zero / (label.shape[0] * label.shape[1])
-            df.to_csv(f'{self.dst_base_addr}/{subset}_features.csv')
 
     def generate_img_label(self):
         for subset in ['train', 'test', 'val']:
@@ -216,3 +233,21 @@ class ExtractDicom:
                 es_label_frame = self.make_masks(es_label)
                 skimage.io.imsave(os.path.join(label_path, f"{patient[:-4]}_label_es.jpg"), es_label_frame)
 
+    def calculate_ratio(self):
+        for subset in ['test', 'train', 'val']:
+            df = pd.read_csv(f'{self.dst_base_addr}/{subset}_features.csv')
+            df['ed_frame_class_ratio'] = None
+            df['es_frame_class_ratio'] = None
+            for i in range(len(df)):
+                if df.at[i, 'ED_Frame'] is None:
+                    break
+                else:
+                    for ed_es in ['ed', 'es']:
+                        data = df.at[i, 'FileName']
+                        label = cv2.imread(
+                            f'{self.dst_base_addr}/{subset}/seg_image/{data}_label_{ed_es}.jpg')
+                        label = skimage.color.rgb2gray(label) > 0.5
+                        label = label.astype(int)
+                        n_of_non_zero = cv2.countNonZero(label)
+                        df.at[i, f'{ed_es}_frame_class_ratio'] = n_of_non_zero / (label.shape[0] * label.shape[1])
+            df.to_csv(f'{self.dst_base_addr}/{subset}_features.csv')
