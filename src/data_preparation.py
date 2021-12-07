@@ -43,7 +43,7 @@ class ExtractDicom:
         if not os.path.isdir(self.dst_base_addr):
             os.makedirs(self.dst_base_addr)
 
-    def register_data_features(self):
+    def _register_data_features(self):
 
         """
 
@@ -66,7 +66,7 @@ class ExtractDicom:
                 add_dict_entry(v, "DS", k, k)
             i += 1
 
-    def convert_dicom_to_avi(self, src_addr, dst_file_name, csv_addr):
+    def _convert_dicom_to_avi(self, src_addr, dst_file_name, csv_addr):
 
         """
 
@@ -141,7 +141,7 @@ class ExtractDicom:
             cv2.destroyAllWindows()
             video.release()
 
-    def convert_all_to_avi(self):
+    def _convert_all_to_avi(self):
 
         """
 
@@ -151,7 +151,7 @@ class ExtractDicom:
 
         """
 
-        self.register_data_features()
+        self._register_data_features()
         src = os.path.join(self.src_base_addr, 'Videos')
         files = os.listdir(src)
         csv_addr = os.path.join(self.dst_base_addr, 'FileList.csv')
@@ -160,14 +160,14 @@ class ExtractDicom:
 
             # dst_addr = os.path.join(dst_video_path, f.replace('dcm', 'avi'))
             dst_file_name = f.replace('dcm', 'avi')
-            self.convert_dicom_to_avi(src_path, dst_file_name, csv_addr)
+            self._convert_dicom_to_avi(src_path, dst_file_name, csv_addr)
 
         df = pd.read_csv(csv_addr)
         df[df['Split'] == 'TRAIN'].to_csv(f'{self.dst_base_addr}/train_features.csv', index=False)
         df[df['Split'] == 'TEST'].to_csv(f'{self.dst_base_addr}/test_features.csv', index=False)
         df[df['Split'] == 'VAL'].to_csv(f'{self.dst_base_addr}/val_features.csv', index=False)
 
-    def generate_img(self):
+    def _generate_img(self):
         for subset in ['train', 'test', 'val']:
             df = pd.read_csv(f'{self.dst_base_addr}/{subset}_features.csv')
             impath = f'{self.dst_base_addr}/{subset}/seg_image'
@@ -211,7 +211,7 @@ class ExtractDicom:
 
         return mask
 
-    def generate_label(self):
+    def _generate_label(self):
         """
         Generate label images and save them in a specific directory
 
@@ -244,7 +244,7 @@ class ExtractDicom:
                 es_label_frame = self.make_masks(es_label)
                 skimage.io.imsave(os.path.join(label_path, f"{patient[:-4]}_label_es.jpg"), es_label_frame)
 
-    def calculate_ratio(self):
+    def _calculate_ratio(self):
         """
         This method calculate the ratio of each class (which is only 1 here) to all pixels in label frames.
         This method add all these data to new column for each ED and ES frame for each patient.
@@ -269,7 +269,7 @@ class ExtractDicom:
 
     def prepare_data(self):
 
-        self.convert_all_to_avi()
-        self.generate_img()
-        self.generate_label()
-        self.calculate_ratio()
+        self._convert_all_to_avi()
+        self._generate_img()
+        self._generate_label()
+        self._calculate_ratio()

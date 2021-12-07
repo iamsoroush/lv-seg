@@ -42,7 +42,7 @@ class DICOMHandler:
         self.echo_data_info = {}
         self.df_echo = pd.read_csv(csv_file_addr)
 
-    def register_data_features(self):
+    def _register_data_features(self):
 
         """
 
@@ -65,7 +65,7 @@ class DICOMHandler:
                 add_dict_entry(v, "DS", k, k)
             i += 1
 
-    def convert_avi_to_dicom(self, img, dst_addr, attributes):
+    def _convert_avi_to_dicom(self, img, dst_addr, attributes):
 
         """
 
@@ -113,7 +113,7 @@ class DICOMHandler:
         ds.save_as(dst_addr, write_like_original=False)
 
     @staticmethod
-    def read_avi_file(addr):
+    def _read_avi_file(addr):
 
         """
 
@@ -148,7 +148,7 @@ class DICOMHandler:
 
         """
 
-        self.register_data_features()
+        self._register_data_features()
         for k, v in self.df_echo.iterrows():
 
             # src_addr = os.path.join(self.src_base_addr, f'{v.Split.lower()}/videos/{v.FileName}.avi')
@@ -160,5 +160,5 @@ class DICOMHandler:
                 os.makedirs(dst_video_path)
 
             dst_addr = os.path.join(dst_video_path, f'{v.FileName}.dcm')
-            image = np.array(self.read_avi_file(src_addr))
-            self.convert_avi_to_dicom(image, dst_addr, v)
+            image = np.array(self._read_avi_file(src_addr))
+            self._convert_avi_to_dicom(image, dst_addr, v)
