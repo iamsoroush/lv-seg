@@ -163,9 +163,9 @@ class ExtractDicom:
             self.convert_dicom_to_avi(src_path, dst_file_name, csv_addr)
 
         df = pd.read_csv(csv_addr)
-        df[df['Split'] == 'TRAIN'].to_csv(f'{self.dst_base_addr}/train_features.csv')
-        df[df['Split'] == 'TEST'].to_csv(f'{self.dst_base_addr}/test_features.csv')
-        df[df['Split'] == 'VAL'].to_csv(f'{self.dst_base_addr}/val_features.csv')
+        df[df['Split'] == 'TRAIN'].to_csv(f'{self.dst_base_addr}/train_features.csv', index=False)
+        df[df['Split'] == 'TEST'].to_csv(f'{self.dst_base_addr}/test_features.csv', index=False)
+        df[df['Split'] == 'VAL'].to_csv(f'{self.dst_base_addr}/val_features.csv', index=False)
 
     def generate_img(self):
         for subset in ['train', 'test', 'val']:
@@ -175,18 +175,14 @@ class ExtractDicom:
                 os.makedirs(impath)
 
             for data, ed_frame, es_frame in zip(df['FileName'], df['ED_Frame'], df['ES_Frame']):
-                vidpath = f'{self.dst_base_addr}/{subset}/videos/{data}.avi'
+                vidpath = f'{self.dst_base_addr}/{subset}/Videos/{data}.avi'
                 vidcap = cv2.VideoCapture(vidpath)
                 success, image = vidcap.read()
                 count = 1
                 while success:
-                    if ed_frame is None:
-                        continue
-                    elif count == int(ed_frame):
+                    if count == int(ed_frame):
                         cv2.imwrite(os.path.join(impath, f"{data}_image_ed.jpg"), image)
-                    if es_frame is None:
-                        continue
-                    elif count == int(es_frame):
+                    if count == int(es_frame):
                         cv2.imwrite(os.path.join(impath, f"{data}_image_es.jpg"), image)
                     success, image = vidcap.read()
                     count += 1
@@ -222,9 +218,9 @@ class ExtractDicom:
         """
         tracing_df = self.df_volume
         patient_unique = tracing_df['FileName'].unique()
-        val_data_list = os.listdir(f'{self.dst_base_addr}/val/videos')
-        test_data_list = os.listdir(f'{self.dst_base_addr}/test/videos')
-        train_data_list = os.listdir(f'{self.dst_base_addr}/train/videos')
+        val_data_list = os.listdir(f'{self.dst_base_addr}/val/Videos')
+        test_data_list = os.listdir(f'{self.dst_base_addr}/test/Videos')
+        train_data_list = os.listdir(f'{self.dst_base_addr}/train/Videos')
         for patient in patient_unique:
             patient_labels = tracing_df[tracing_df['FileName'] == patient]
             labels_frame = patient_labels['Frame'].unique()
