@@ -1,5 +1,5 @@
 from abstractions import EvaluatorBase
-from abstractions.evaluator import EvalFuncs
+from abstractions.evaluation import EvalFuncs
 
 from .eval_funcs import get_tpr, get_tnr, get_dice_coeff, get_soft_dice, get_iou_coef, get_soft_iou
 

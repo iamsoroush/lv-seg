@@ -59,14 +59,14 @@ class UNetBaselineBuilder(ModelBuilderBase):
         self.metrics = config.model_builder.metrics
         self.input_h = config.input_height
         self.input_w = config.input_width
-        self.n_chanels = config.n_channels
+        self.n_channels = 1
         self.inference_threshold = config.model_builder.inference_threshold
 
     def _set_defaults(self):
         self.optimizer_type = 'adam'
         self.learning_rate = 0.001
         self.loss_type = 'binary_crossentropy'
-        self.metrics = ['iou']
+        self.metrics = ['acc']
         self.input_h = 128
         self.input_w = 128
         self.n_channels = 1

@@ -2,19 +2,16 @@
 seed: 101
 input_height: 128 # For resizing and model creation
 input_width: 128 # For resizing and model creation
-original_input_h : 112 # For reshaping in preprocessing
-original_input_w : 112 # For reshaping in preprocessing
-original_input_channel : 1 # For reshaping in preprocessing
 # n_channels must be set in code based on dataset and task
 
-src_code_path: 'src'
-data_dir: '/home/vafaeisa/scratch/datasets/echonet'
+src_code_path: 'src' # put '' if packages are in root directory of your repository
+data_dir: 'assets/EchoNet-Dynamic'
 
 # Classes
 data_loader_class: dataset.DataLoader # Required
-model_builder_class: models.ModelBuilder # Required
-preprocessor_class: preprocessing.Preprocessror # Required
-augmentor_class: augmentation.Augmentor
+model_builder_class: model.UNetBaselineBuilder # Required
+preprocessor_class: dataset.Preprocessor # Required
+augmentor_class: dataset.Augmentor
 evaluator_class: evaluation.Evaluator
 
 # Epochs
@@ -25,16 +22,16 @@ batch_size: 8
 
 # Parameters for instantiating DataLoader
 data_loader:
-  target_dataset_name: "EchoNet_Dynamic"
-  dataset_dir: 'D:\AIMedic\FinalProject_echocardiogram\echoC_Dataset\echonet_dynamic\EchoNet-Dynamic'
-  batch_size: 8
   shuffle: True # on training data
+  split_ratio: 0.9
   to_fit: True
-  seed: 101
-  sample_weights: [1, 10]
   dataset_features:
-    stage: ["ES", "ED"]
-    view: ["4CH"]
+    age: [ 18, 100 ]
+    sex: [ "M", "F" ]
+    stage: [ "ES", "ED" ]
+    image_quality: [ "Poor", "Medium", "Good" ]
+    view: [ "4CH" ]
+
 
 # Parameters for model-builder
 model_builder:
@@ -42,19 +39,23 @@ model_builder:
     type: "adam"
     initial_lr: 0.0001
   loss_type: "binary_crossentropy"
+  metrics: ['acc']
+  inference_threshold: 0.5
 
 # Parameters for instantiating Preprocessor
 preprocessor:
   normalization_type: null
+  format: "gray_scale"
   max: 255
   min: 0
   do_resizing: True
   do_normalization: True
 
+
 # Parameters for instantiating augmentation
 do_train_augmentation: True
 do_validation_augmentation: False
-augmentator:
+augmentor:
   rotation_proba: 0.5
   rotation_range: 45
   flip_proba: 0.5
