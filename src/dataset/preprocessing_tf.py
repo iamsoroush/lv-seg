@@ -41,14 +41,14 @@ class PreprocessorTF(PreprocessorBase):
 
         return pre_processed_img
 
-    def label_preprocess(self, label, weight):
+    def label_preprocess(self, label):
         """
 
         Args:
             label: a tensor containing single label
-            weight: a tensor containing single weight
 
-        Returns: preprocessed label tensor , preprocessed weight tensor
+
+        Returns: preprocessed label tensor
 
         in this method resizing will be done based on config setting
 
@@ -57,13 +57,32 @@ class PreprocessorTF(PreprocessorBase):
 
         """
         pre_processed_label = tf.reshape(label, shape=(self.original_input_h, self.original_input_w))
-        pre_processed_weight = tf.reshape(weight, shape=(self.original_input_h, self.original_input_w))
 
         if self.do_resizing:
             pre_processed_label = self._resize(pre_processed_label[:, :, tf.newaxis])
+
+        return pre_processed_label
+
+    def weight_preprocess(self, weight):
+        """
+
+        Args:
+            weight: a tensor containing single weight
+
+        Returns: preprocessed weight tensor
+
+        in this method resizing will be done based on config setting
+
+        Notes : AT first the input tensors will be reshaped into their original shape to evoid  further errors
+        THIS IS A MUST , and this is usable if only all your data in your dataset , have  the  same shape
+
+        """
+        pre_processed_weight = tf.reshape(weight, shape=(self.original_input_h, self.original_input_w))
+
+        if self.do_resizing:
             pre_processed_weight = self._resize(pre_processed_weight[:, :, tf.newaxis])
 
-        return pre_processed_label, pre_processed_weight
+        return pre_processed_weight
 
     def _wrapper_image_preprocess(self, x, y, w):
         """
@@ -95,8 +114,12 @@ class PreprocessorTF(PreprocessorBase):
         x will not change here
 
         """
-        pre_processed_y, pre_processed_w = self.label_preprocess(y, w)
-        return x, pre_processed_y, pre_processed_w
+        pre_processed_y = self.label_preprocess(y)
+        return x, pre_processed_y, w
+
+    def _wrapper_weight_preprocess(self, x, y, w):
+        preprocessed_w = self.weight_preprocess(w)
+        return x, y, preprocessed_w
 
     def add_image_preprocess(self, generator):
         """
@@ -128,6 +151,10 @@ class PreprocessorTF(PreprocessorBase):
          """
 
         return generator.map(self._wrapper_label_preprocess)
+
+    def add_weight_preprocess(self, generator):
+
+        return generator.map(self._wrapper_weight_preprocess)
 
     def batchify(self, generator, n_data_points):
         """
@@ -210,6 +237,7 @@ class PreprocessorTF(PreprocessorBase):
         """
         gen = self.add_image_preprocess(generator)
         gen = self.add_label_preprocess(gen)
+        gen = self.add_weight_preprocess(gen)
         gen, n_iter = self.batchify(gen, n_data_points)
         return gen, n_iter
 

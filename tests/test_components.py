@@ -116,11 +116,11 @@ class TestDataLoader:
 
     @pytest.mark.dependency(depends=['TestDataLoader::test_create_training_generator'])
     def test_train_n(self, run_config, component_holder):
-        assert hasattr(component_holder['train_data_gen'], '__iter__')
+        assert isinstance(component_holder['train_n'], int)
 
     @pytest.mark.dependency(depends=['TestDataLoader::test_create_training_generator'])
     def test_train_generator(self, run_config, component_holder):
-        assert isinstance(component_holder['train_n'], int)
+        assert hasattr(component_holder['train_data_gen'], '__iter__')
 
     @pytest.mark.dependency(depends=['TestDataLoader::test_train_generator'])
     def test_train_gen_out(self, component_holder):
@@ -345,7 +345,11 @@ class TestPreprocessor:
         data_gen = component_holder['evaluation_data_gen']
         n = component_holder['evaluation_n']
 
-        ret = preprocessor.add_preprocess(data_gen, n)
+        # ret = preprocessor.add_preprocess(data_gen, n)
+        gen = preprocessor.add_image_preprocess(data_gen)
+        gen = preprocessor.add_label_preprocess(gen)
+        ret = preprocessor.batchify(gen, n)
+
         assert len(ret) == 2
 
         gen, n_iter = ret

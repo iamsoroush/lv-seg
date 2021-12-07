@@ -24,6 +24,12 @@ class Preprocessor(PreprocessorBase):
 
     """
 
+    def weight_preprocess(self, weight):
+        pass
+
+    def add_weight_preprocess(self, generator):
+        return generator
+
     def image_preprocess(self, image):
 
         """

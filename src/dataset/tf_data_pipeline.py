@@ -87,7 +87,7 @@ class DataSetCreator:
             sample_weights = self._create_sample_weights(label)
             return image, label, sample_weights
         else:
-            data_id = [x_path, y_path]
+            data_id = str(x_path)
             return image, label, data_id
 
     def _parse_function(self, x, y):
@@ -110,7 +110,9 @@ class DataSetCreator:
         Returns:
             loaded_dataset, tf.data.Dataset
         """
-        self.loaded_dataset = self.dataset.map(self._parse_function, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+
+        self.loaded_dataset = self.dataset.map(self._parse_function)
+        # self.loaded_dataset = self.dataset.map(self._parse_function, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         self.loaded_dataset = self.loaded_dataset.cache()
 
         # Make dataset fetch batches in the background during the training of the model.

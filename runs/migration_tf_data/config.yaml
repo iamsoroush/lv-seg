@@ -8,25 +8,26 @@ original_input_channel : 1 # For reshaping in preprocessing
 n_channels : 1 # must be set in code based on dataset and task
 
 src_code_path: 'src' # put '' if packages are in root directory of your repository
+data_dir: 'assets/EchoNet-Dynamic'
 
 # Classes
-data_loader_class: dataset.DataLoader # Required
-model_builder_class: models.ModelBuilder # Required
-preprocessor_class: preprocessing.Preprocessror # Required
-augmentor_class: augmentation.Augmentor
+data_loader_class: dataset.DataLoaderTF # Required
+model_builder_class: model.UNetBaselineBuilder # Required
+preprocessor_class: dataset.PreprocessorTF # Required
+augmentor_class: dataset.AugmentorTF
 evaluator_class: evaluation.Evaluator
 
 # Epochs
-epochs: 30
+epochs: 20
 
 # Batch-size
-batch_size: 8
+batch_size: 16
 
 # Parameters for instantiating DataLoader
 data_loader:
   target_dataset_name: "EchoNet_Dynamic"
-  dataset_dir: '/content/EchoNet-Dynamic'
-  batch_size: 8
+#  dataset_dir: '/content/EchoNet-Dynamic'
+#  batch_size: 8
   shuffle: True # on training data
   to_fit: True
   seed: 101
@@ -64,6 +65,3 @@ augmentator:
 export:
   metric: "val_loss"
   mode: "min"
-
-# MLFlow
-project_name: 'echo-lv-seg' # will be used as mlflow's experiment_name
