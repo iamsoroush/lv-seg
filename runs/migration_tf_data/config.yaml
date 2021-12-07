@@ -5,10 +5,9 @@ input_width: 128 # For resizing and model creation
 original_input_h : 112 # For reshaping in preprocessing
 original_input_w : 112 # For reshaping in preprocessing
 original_input_channel : 1 # For reshaping in preprocessing
-# n_channels must be set in code based on dataset and task
+n_channels : 1 # must be set in code based on dataset and task
 
-src_code_path: 'src'
-data_dir: '/home/vafaeisa/scratch/datasets/echonet'
+src_code_path: 'src' # put '' if packages are in root directory of your repository
 
 # Classes
 data_loader_class: dataset.DataLoader # Required
@@ -26,7 +25,7 @@ batch_size: 8
 # Parameters for instantiating DataLoader
 data_loader:
   target_dataset_name: "EchoNet_Dynamic"
-  dataset_dir: 'D:\AIMedic\FinalProject_echocardiogram\echoC_Dataset\echonet_dynamic\EchoNet-Dynamic'
+  dataset_dir: '/content/EchoNet-Dynamic'
   batch_size: 8
   shuffle: True # on training data
   to_fit: True
@@ -42,6 +41,8 @@ model_builder:
     type: "adam"
     initial_lr: 0.0001
   loss_type: "binary_crossentropy"
+  metrics : ["dice_coef", "iou", "acc"]
+  inference_threshold: 0.5
 
 # Parameters for instantiating Preprocessor
 preprocessor:
@@ -63,3 +64,6 @@ augmentator:
 export:
   metric: "val_loss"
   mode: "min"
+
+# MLFlow
+project_name: 'echo-lv-seg' # will be used as mlflow's experiment_name
