@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import skimage.draw
 import skimage.color
+import skimage.io
 import pydicom as dicom
 from pydicom.datadict import add_dict_entry
 
@@ -87,58 +88,58 @@ class ExtractDicom:
         ds = dicom.dcmread(src_addr)
         data = {}
         file_name = ds.FileName
-        ed_frame, es_frame = None, None
+        #ed_frame, es_frame = None, None
         if file_name + '.avi' in self.df_volume['FileName'].unique():
             ed_frame, es_frame = self.df_volume.loc[self.df_volume['FileName'] == file_name + '.avi', ['Frame']][
                 'Frame'].unique()
-        data['ED_Frame'] = ed_frame
-        data['ES_Frame'] = es_frame
+            data['ED_Frame'] = ed_frame
+            data['ES_Frame'] = es_frame
 
-        subset = ds.Split.lower()
-        data['image_address_ed'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_image_ed.jpg'
-        data['image_address_es'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_image_es.jpg'
-        data['label_address_ed'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_label_ed.jpg'
-        data['label_address_es'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_label_es.jpg'
+            subset = ds.Split.lower()
+            data['image_address_ed'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_image_ed.jpg'
+            data['image_address_es'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_image_es.jpg'
+            data['label_address_ed'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_label_ed.jpg'
+            data['label_address_es'] = f'{self.dst_base_addr}/{subset}/seg_image/{file_name}_label_es.jpg'
 
-        if not os.path.isfile(csv_addr):
-            for k in ds.keys():
-                key = ds[k].name
-                if key not in defaults:
-                    data[key] = [ds[k].value]
-
-            df = pd.DataFrame(data)
-            df.to_csv(csv_addr, index=False)
-
-        else:
-            df = pd.read_csv(csv_addr)
-            if ds.FileName not in list(df.FileName):
+            if not os.path.isfile(csv_addr):
                 for k in ds.keys():
                     key = ds[k].name
                     if key not in defaults:
-                        data[key] = ds[k].value
+                        data[key] = [ds[k].value]
 
-                df = df.append(data, ignore_index=True)
-
+                df = pd.DataFrame(data)
                 df.to_csv(csv_addr, index=False)
 
-        pixel_array_numpy = ds.pixel_array
+            else:
+                df = pd.read_csv(csv_addr)
+                if ds.FileName not in list(df.FileName):
+                    for k in ds.keys():
+                        key = ds[k].name
+                        if key not in defaults:
+                            data[key] = ds[k].value
 
-        width, height = pixel_array_numpy.shape[1:]
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        sub_folder = f'{ds.Split.lower()}/Videos'
-        sub_folder_path = os.path.join(sub_folder, dst_file_name)
-        if not os.path.isdir(os.path.join(self.dst_base_addr, sub_folder)):
-            os.makedirs(os.path.join(self.dst_base_addr, sub_folder))
+                    df = df.append(data, ignore_index=True)
 
-        dst_path = os.path.join(self.dst_base_addr, sub_folder_path)
-        video = cv2.VideoWriter(dst_path, fourcc, 1, (width, height))
+                    df.to_csv(csv_addr, index=False)
 
-        for p in pixel_array_numpy:
-            frame = cv2.cvtColor(p.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-            video.write(frame)
+            pixel_array_numpy = ds.pixel_array
 
-        cv2.destroyAllWindows()
-        video.release()
+            width, height = pixel_array_numpy.shape[1:]
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            sub_folder = f'{ds.Split.lower()}/Videos'
+            sub_folder_path = os.path.join(sub_folder, dst_file_name)
+            if not os.path.isdir(os.path.join(self.dst_base_addr, sub_folder)):
+                os.makedirs(os.path.join(self.dst_base_addr, sub_folder))
+
+            dst_path = os.path.join(self.dst_base_addr, sub_folder_path)
+            video = cv2.VideoWriter(dst_path, fourcc, 1, (width, height))
+
+            for p in pixel_array_numpy:
+                frame = cv2.cvtColor(p.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+                video.write(frame)
+
+            cv2.destroyAllWindows()
+            video.release()
 
     def convert_all_to_avi(self):
 
@@ -166,7 +167,7 @@ class ExtractDicom:
         df[df['Split'] == 'TEST'].to_csv(f'{self.dst_base_addr}/test_features.csv')
         df[df['Split'] == 'VAL'].to_csv(f'{self.dst_base_addr}/val_features.csv')
 
-    def generate_img_label(self):
+    def generate_img(self):
         for subset in ['train', 'test', 'val']:
             df = pd.read_csv(f'{self.dst_base_addr}/{subset}_features.csv')
             impath = f'{self.dst_base_addr}/{subset}/seg_image'
@@ -192,6 +193,16 @@ class ExtractDicom:
 
     @staticmethod
     def make_masks(contours_points):
+        """
+        Create segmented label from our data in TracingVolume.csv data that contains contours data point for
+        each ED or ES frame.
+
+        Args:
+            contours_points: a set of points that designate the location of left ventricle
+
+        Returns: segmented image
+
+        """
 
         x1, y1, x2, y2 = contours_points[:, 0], contours_points[:, 1], contours_points[:, 2], contours_points[:, 3]
 
@@ -204,7 +215,11 @@ class ExtractDicom:
 
         return mask
 
-    def construct_all_mask(self):
+    def generate_label(self):
+        """
+        Generate label images and save them in a specific directory
+
+        """
         tracing_df = self.df_volume
         patient_unique = tracing_df['FileName'].unique()
         val_data_list = os.listdir(f'{self.dst_base_addr}/val/videos')
@@ -234,6 +249,10 @@ class ExtractDicom:
                 skimage.io.imsave(os.path.join(label_path, f"{patient[:-4]}_label_es.jpg"), es_label_frame)
 
     def calculate_ratio(self):
+        """
+        This method calculate the ratio of each class (which is only 1 here) to all pixels in label frames.
+        This method add all these data to new column for each ED and ES frame for each patient.
+        """
         for subset in ['test', 'train', 'val']:
             df = pd.read_csv(f'{self.dst_base_addr}/{subset}_features.csv')
             df['ed_frame_class_ratio'] = None
@@ -250,4 +269,11 @@ class ExtractDicom:
                         label = label.astype(int)
                         n_of_non_zero = cv2.countNonZero(label)
                         df.at[i, f'{ed_es}_frame_class_ratio'] = n_of_non_zero / (label.shape[0] * label.shape[1])
-            df.to_csv(f'{self.dst_base_addr}/{subset}_features.csv')
+            df.to_csv(f'{self.dst_base_addr}/{subset}_features.csv', index=False)
+
+    def prepare_data(self):
+
+        self.convert_all_to_avi()
+        self.generate_img()
+        self.generate_label()
+        self.calculate_ratio()
