@@ -2,7 +2,7 @@ import os
 import sys
 import pytest
 import pandas as pd
-from .data_preparation import ExtractDicom
+from data_preparation import ExtractDicom
 
 
 class TestExtractDicom:
@@ -30,7 +30,7 @@ class TestExtractDicom:
     @pytest.fixture
     def excel_columns(self):
         features = [
-            ['FileName',
+             'FileName',
              'EF',
              'ESV',
              'EDV',
@@ -47,7 +47,6 @@ class TestExtractDicom:
              'label_address_es',
              'ed_frame_class_ratio',
              'es_frame_class_ratio'
-             ]
         ]
         return features
 
@@ -89,7 +88,7 @@ class TestExtractDicom:
         csv_addr = f'{dst}/train_features.csv'
         df = pd.read_csv(csv_addr)
         check_addr = []
-        for a in addr:
+        for a in image_label_addr:
             for i in df.head(int(len(df) * 0.05))[a]:
                 check_addr.append(os.path.isfile(i))
             assert all(check_addr)
@@ -99,7 +98,7 @@ class TestExtractDicom:
         csv_addr = f'{dst}/test_features.csv'
         df = pd.read_csv(csv_addr)
         check_addr = []
-        for a in addr:
+        for a in image_label_addr:
             for i in df.head(int(len(df) * 0.05))[a]:
                 check_addr.append(os.path.isfile(i))
             assert all(check_addr)
@@ -109,7 +108,7 @@ class TestExtractDicom:
         csv_addr = f'{dst}/val_features.csv'
         df = pd.read_csv(csv_addr)
         check_addr = []
-        for a in addr:
+        for a in image_label_addr:
             for i in df.head(int(len(df) * 0.05))[a]:
                 check_addr.append(os.path.isfile(i))
             assert all(check_addr)

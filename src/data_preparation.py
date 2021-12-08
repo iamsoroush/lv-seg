@@ -105,6 +105,8 @@ class ExtractDicom:
                 for k in ds.keys():
                     key = ds[k].name
                     if key not in defaults:
+                        if key == 'Number of Frames':
+                            key = 'NumberOfFrames'
                         data[key] = [ds[k].value]
 
                 df = pd.DataFrame(data)
@@ -116,6 +118,8 @@ class ExtractDicom:
                     for k in ds.keys():
                         key = ds[k].name
                         if key not in defaults:
+                            if key == 'Number of Frames':
+                                key = 'NumberOfFrames'
                             data[key] = ds[k].value
 
                     df = df.append(data, ignore_index=True)
