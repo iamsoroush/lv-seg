@@ -21,7 +21,7 @@ evaluator_class: evaluation.Evaluator
 epochs: 20
 
 # Batch-size
-batch_size: 16
+batch_size: 32
 
 # Parameters for instantiating DataLoader
 data_loader:
