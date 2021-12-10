@@ -15,7 +15,7 @@ augmentor_class: dataset.Augmentor
 evaluator_class: evaluation.Evaluator
 
 # Epochs
-epochs: 30
+epochs: 20
 
 # Batch-size
 batch_size: 32

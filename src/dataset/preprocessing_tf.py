@@ -167,7 +167,7 @@ class PreprocessorTF(PreprocessorBase):
                  n_iter  = type(int) number of steps per epoch
 
         """
-        generator = generator.batch(self.batch_size).cache().repeat()
+        generator = generator.batch(self.batch_size).prefetch(tf.data.AUTOTUNE).cache().repeat()
         n_iter = n_data_points // self.batch_size + int((n_data_points % self.batch_size) > 0)
 
         return generator, n_iter
