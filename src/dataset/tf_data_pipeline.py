@@ -113,7 +113,7 @@ class DataSetCreator:
 
         self.loaded_dataset = self.dataset.map(self._parse_function)
         # self.loaded_dataset = self.dataset.map(self._parse_function, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        self.loaded_dataset = self.loaded_dataset.cache()
+        # self.loaded_dataset = self.loaded_dataset.cache()
 
         # Make dataset fetch batches in the background during the training of the model.
         self.loaded_dataset = self.loaded_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
