@@ -30,13 +30,12 @@ class Preprocessor(PreprocessorBase):
         self._load_params(config)
         self.batch_size = config.batch_size
 
-    def img_preprocess(self, image, inference=False):
+    def image_preprocess(self, image):
 
         """
         pre-processing on input image
 
         :param image: input image, np.array with shape of (w, h, 1) or (w, h, 3)
-        :param inference: resize if the user is in inference phase
 
         :return: pre_processed_img
         """
@@ -45,7 +44,7 @@ class Preprocessor(PreprocessorBase):
         converted_to_gray = False
 
         # resizing
-        if self.do_resizing or inference:
+        if self.do_resizing:
             pre_processed_img = self._resize(pre_processed_img)
 
         # converting the images to grayscale
