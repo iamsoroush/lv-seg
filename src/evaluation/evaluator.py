@@ -1,24 +1,19 @@
 from abstractions import EvaluatorBase
-from abstractions.evaluation import EvalFuncs
-
-from .eval_funcs import get_tpr, get_tnr, get_dice_coeff, get_soft_dice, get_iou_coef, get_soft_iou
+from aimedeval.segmentation import IoUScore, SoftIoUScore, DiceScore, SoftDice, TPR, TNR, Precision
 
 
 class Evaluator(EvaluatorBase):
-    def get_eval_funcs(self) -> EvalFuncs:
+    def get_eval_funcs(self):
 
-        tpr = get_tpr(threshold=0.5)
-        tnr = get_tnr(threshold=0.5)
-        dice = get_dice_coeff(threshold=0.5)
-        soft_dice = get_soft_dice()
-        iou = get_iou_coef(threshold=0.5)
-        soft_iou = get_soft_iou()
+        threshold = 0.5
 
-        funcs = {tpr.__name__: tpr,
-                 tnr.__name__: tnr,
-                 dice.__name__: dice,
-                 soft_dice.__name__: soft_dice,
-                 iou.__name__: iou,
-                 soft_iou.__name__: soft_iou}
+        tpr = TPR(threshold=threshold)
+        tnr = TNR(threshold=threshold)
+        dice = DiceScore(threshold=threshold)
+        soft_dice = SoftDice()
+        iou = IoUScore(threshold=threshold)
+        soft_iou = SoftIoUScore()
+
+        funcs = [tpr, tnr, dice, soft_dice, iou, soft_iou]
 
         return funcs

@@ -45,15 +45,14 @@ class DataLoader(DataLoaderBase):
 
     """
 
-    def __init__(self, config, data_dir):
+    def __init__(self, config):
 
         """
         Handles data loading: loading, preparing, data generators
         """
 
-        super().__init__(config, data_dir)
+        super().__init__(config)
 
-        self.data_dir = data_dir
         self.df_dataset = None
         self._build_data_frame()
 
@@ -100,6 +99,7 @@ class DataLoader(DataLoaderBase):
         self.seed = config.seed
         self.shuffle = cfg_dl.shuffle
         self.to_fit = cfg_dl.to_fit
+        self.data_dir = config.data_dir
         self.info_df_dir = os.path.join(self.data_dir, 'info_df.csv')
 
     def _set_defaults(self):

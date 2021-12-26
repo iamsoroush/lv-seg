@@ -45,15 +45,14 @@ class EchoNetDataLoader(DataLoaderBase):
 
     """
 
-    def __init__(self, config, data_dir):
+    def __init__(self, config):
 
         """
         Handles data loading: loading, preparing, data generators
         """
 
-        # super().__init__(config)
-        super().__init__(config, data_dir)
-        # self._load_params(config)
+        super().__init__(config)
+        self.info_df_dir = os.path.join(self.dataset_dir, 'info_df.csv')
 
         self.df_dataset = None
         self._build_data_frame()
@@ -102,8 +101,7 @@ class EchoNetDataLoader(DataLoaderBase):
         self.seed = cfg_dl.seed
         self.shuffle = cfg_dl.shuffle
         self.to_fit = cfg_dl.to_fit
-        self.dataset_dir = self.data_dir
-        self.info_df_dir = os.path.join(self.data_dir, 'info_df.csv')
+        self.dataset_dir = config.data_dir
 
     def _set_defaults(self):
 
@@ -119,8 +117,7 @@ class EchoNetDataLoader(DataLoaderBase):
         self.sample_weights = None
         self.shuffle = True
         self.to_fit = True
-        self.dataset_dir = self.data_dir
-        self.info_df_dir = os.path.join(self.data_dir, 'info_df.csv')
+        self.dataset_dir = '/contents/EchoNet-Dynamic'
 
     def create_training_generator(self):
 
@@ -134,6 +131,7 @@ class EchoNetDataLoader(DataLoaderBase):
 
         dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.sample_weights)
         train_data_gen = dataset_creator.load_process()
+        train_data_gen.shuffle()
         train_n = len(train_data_gen)
         return train_data_gen, train_n
 

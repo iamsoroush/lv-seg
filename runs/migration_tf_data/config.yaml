@@ -18,7 +18,7 @@ augmentor_class: dataset.AugmentorTF
 evaluator_class: evaluation.Evaluator
 
 # Epochs
-epochs: 10
+epochs: 20
 
 # Batch-size
 batch_size: 32
@@ -65,3 +65,36 @@ augmentator:
 export:
   metric: "val_loss"
   mode: "min"
+
+
+# ------------ Optional fields for generating model-cards ------------
+model_details:
+  name: BaseLineUnetV2
+  overview: This model aims to segment left-ventricle in A4C-view echocardiography videos # A description of the model
+  documentation: This model will be used as a part of "echoapp service" in AIMedic's image services # A more thorough description of the model and its usage.
+
+model_parameters:
+  model_architecture: My model is based on a somehow light-weight UNet-like architecture # specifies the architecture of your model
+  data: the "echonet-dynamic dataset v1" is used to train this model # specifies the datasets used to train and evaluate your model
+  input_format: My model takes a batch of gray-scale images of shape (128, 128, 1) as input # describes the data format for inputs to your model
+  output_format: My model outputs a batch of binary segmentation map of shape (128, 128, 1) as output # describes the data format for outputs from your model
+
+# this section usually requires careful consideration, and conversations with many relevant stakeholders,
+# including other model developers, dataset producers, and downstream users likely to interact with your model,
+# or be affected by its outputs.
+considerations: # Considerations related to model construction, training, and application
+
+  # Who are the intended users of the model? This may include
+  # researchers, developers, and/or clients. You might also include
+  # information about the downstream users you expect to interact with your
+  # model.
+  users: ["Any upstream model that needs a binary lv-segmentor for their purposes, such as a lv-volume-estimator"]
+
+
+  # What are the intended use cases of the model? What use cases are out-of-scope?
+  use_cases: ["Binary segmentation of lv images"]
+
+  # Limitations
+  limitations: ["This model can not segment the other parts of the heart such as the right ventricle, atriums, or myocardium.",
+  "This model can not segment the left ventricle of the heart which works with the battery.",
+  "This model was only trained on the 4-chamber view of the heart."]
