@@ -112,6 +112,7 @@ class DataSetCreator:
         """
 
         self.loaded_dataset = self.dataset.map(self._parse_function).cache()
+        # self.loaded_dataset = self.dataset.map(self._parse_function)
         # self.loaded_dataset = self.dataset.map(self._parse_function, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         # self.loaded_dataset = self.loaded_dataset.cache()
 

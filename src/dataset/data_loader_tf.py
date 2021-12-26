@@ -131,8 +131,8 @@ class EchoNetDataLoader(DataLoaderBase):
 
         dataset_creator = DataSetCreator(self.x_train_dir, self.y_train_dir, self.sample_weights)
         train_data_gen = dataset_creator.load_process()
-        train_data_gen.shuffle()
         train_n = len(train_data_gen)
+        train_data_gen.shuffle(train_n)
         return train_data_gen, train_n
 
     def create_validation_generator(self):

@@ -75,7 +75,10 @@ model_details:
 
 model_parameters:
   model_architecture: My model is based on a somehow light-weight UNet-like architecture # specifies the architecture of your model
-  data: the "echonet-dynamic dataset v1" is used to train this model # specifies the datasets used to train and evaluate your model
+  data:
+    name: Echonet-Dynamic
+    description: A standard full resting echocardiogram study consists of a series of videos and images visualizing the heart from different angles, positions, image acquisition techniques, and human expert annotations (measurements, tracings, and calculations) to provide a baseline to study the cardiac motion and chamber sizes. The dataset contains 10,030 apical-4-chamber echocardiography videos from individuals who underwent imaging between 2016 and 2018 as part of routine clinical care at Stanford University Hospital. Each video was cropped and masked to remove text and information outside of the scanning sector. The resulting images were then downsampled by cubic interpolation into standardized 112x112 pixel videos.
+    link: https://echonet.github.io/dynamic/
   input_format: My model takes a batch of gray-scale images of shape (128, 128, 1) as input # describes the data format for inputs to your model
   output_format: My model outputs a batch of binary segmentation map of shape (128, 128, 1) as output # describes the data format for outputs from your model
 
